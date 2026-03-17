@@ -1,0 +1,45 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link th:href="@{/css/list-style.css}" rel="stylesheet" />
+    <title>Lista projektów</title>
+</head>
+<body>
+<div class="root">
+    <h1>Zarządzanie Projektami</h1>
+    <div class="search-block" style="margin-bottom: 20px;">
+        <form th:action="@{/projektList}" method="get">
+            <input type="text" name="nazwa" placeholder="Szukaj po nazwie..." />
+            <input type="submit" value="Szukaj" />
+        </form>
+    </div>
+    <p>
+        <a th:href="@{/projektEdit}" class="btn">Dodaj projekt</a>
+        <a th:href="@{/zadanieList}">Lista zadań</a>
+        <a th:href="@{/studentList}">Lista studentów</a>
+    </p>
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nazwa</th>
+            <th>Data oddania</th>
+            <th>Akcje</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="p : ${projekty}">
+            <td th:text="${p.projektId}">1</td>
+            <td th:text="${p.nazwa}">Nazwa</td>
+            <td th:text="${p.dataOddania}">2026-01-01</td>
+            <td>
+                <a th:href="@{/projektEdit(projektId=${p.projektId})}">Edytuj</a> |
+                <a th:href="@{/projektEdit(projektId=${p.projektId},delete='true')}">Usuń</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
