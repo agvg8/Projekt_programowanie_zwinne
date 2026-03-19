@@ -1,4 +1,4 @@
-package com.project.service;
+package com.project.backend.service;
 
 import java.net.URI;
 import java.util.Optional;
@@ -11,8 +11,8 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-import com.project.exception.HttpException;
-import com.project.model.Zadanie;
+import com.project.backend.exception.HttpException;
+import com.project.backend.model.Zadanie;
 
 @Service
 public class ZadanieServiceImpl implements ZadanieService {

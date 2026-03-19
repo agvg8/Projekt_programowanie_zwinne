@@ -1,4 +1,4 @@
-package com.project.exception;
+package com.project.backend.exception;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;

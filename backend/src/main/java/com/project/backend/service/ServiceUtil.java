@@ -1,4 +1,4 @@
-package com.project.service;
+package com.project.backend.service;
 
 import java.net.URI;
 import org.springframework.core.ParameterizedTypeReference;
