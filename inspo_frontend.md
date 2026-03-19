@@ -99,3 +99,13 @@ Czcionki:
 ## Przykładowy szkic
 
 <img width="1163" height="913" alt="image" src="https://github.com/user-attachments/assets/a69936f6-08bf-4bf4-a8ab-0846871d8f8d" />
+
+
+## Dalszy plan
+
+Po bokach dodajemy delikatny wzór; możliwe dodanie wyboru motywu tej przestrzeni przez użytkownika.
+
+Określenie funkcji na pasek boczny - dodanie odpowiednich ekranów. 
+
+Dodanie ekranu profilu użytkownika.
+
