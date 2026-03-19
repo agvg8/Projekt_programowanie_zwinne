@@ -4,13 +4,18 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
+@Setter
+@Getter
+@NoArgsConstructor
 @Entity
 @Table(name = "projekt")
 @EntityListeners(AuditingEntityListener.class)
@@ -29,12 +34,11 @@ public class Projekt {
     private String opis;
 
     @CreatedDate
-    @Column(name = "dataczas_utworzenia", nullable = false, updatable = false)
-    private LocalDateTime createdDate;
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime dataczas_utworzenia;
 
-    @LastModifiedDate
-    @Column(name = "dataczas_modyfikacji", insertable = false)
-    private LocalDateTime lastModifiedDate;
+    @Column
+    private LocalDateTime data_oddania;
 
     @OneToMany(mappedBy = "projekt")
     @JsonIgnoreProperties({"projekt"})
@@ -46,25 +50,9 @@ public class Projekt {
             inverseJoinColumns = {@JoinColumn(name = "student_id")})
     private Set<Student> studenci;
 
-    public Projekt() {}
-
     public Projekt(String nazwa, String opis) {
         this.nazwa = nazwa;
         this.opis = opis;
     }
 
-    public Integer getProjektId() { return projektId; }
-    public void setProjektId(Integer projektId) { this.projektId = projektId; }
-    public String getNazwa() { return nazwa; }
-    public void setNazwa(String nazwa) { this.nazwa = nazwa; }
-    public String getOpis() { return opis; }
-    public void setOpis(String opis) { this.opis = opis; }
-    public LocalDateTime getCreatedDate() { return createdDate; }
-    public void setCreatedDate(LocalDateTime createdDate) { this.createdDate = createdDate; }
-    public LocalDateTime getLastModifiedDate() { return lastModifiedDate; }
-    public void setLastModifiedDate(LocalDateTime lastModifiedDate) { this.lastModifiedDate = lastModifiedDate; }
-    public List<Zadanie> getZadania() { return zadania; }
-    public void setZadania(List<Zadanie> zadania) { this.zadania = zadania; }
-    public Set<Student> getStudenci() { return studenci; }
-    public void setStudenci(Set<Student> studenci) { this.studenci = studenci; }
 }
