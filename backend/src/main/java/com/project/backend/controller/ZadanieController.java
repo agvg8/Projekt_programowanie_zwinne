@@ -1,8 +1,8 @@
-package com.project.controller;
+package com.project.backend.controller;
 
-import com.project.model.Zadanie;
-import com.project.service.ZadanieService;
-import com.project.service.ProjektService;
+import com.project.backend.model.Zadanie;
+import com.project.backend.service.ZadanieServiceImpl;
+import com.project.backend.service.ProjektService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.*;
 
 @Controller
 public class ZadanieController {
-    private final ZadanieService zadanieService;
+    private final ZadanieServiceImpl zadanieService;
     private final ProjektService projektService;
 
-    public ZadanieController(ZadanieService zadanieService, ProjektService projektService) {
+    public ZadanieController(ZadanieServiceImpl zadanieService, ProjektService projektService) {
         this.zadanieService = zadanieService;
         this.projektService = projektService;
     }

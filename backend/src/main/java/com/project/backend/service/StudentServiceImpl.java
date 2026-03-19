@@ -1,4 +1,4 @@
-package com.project.service;
+package com.project.backend.service;
 
 import java.net.URI;
 import java.util.Optional;
@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-import com.project.model.Student;
+import com.project.backend.model.Student;
 
 @Service
 public class StudentServiceImpl implements StudentService {
