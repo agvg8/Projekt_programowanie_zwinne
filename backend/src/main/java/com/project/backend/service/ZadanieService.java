@@ -4,7 +4,7 @@ import com.project.backend.model.Zadanie;
 import org.springframework.data.domain.Page;
 
 import java.util.Optional;
-import java.awt.print.Pageable;
+import org.springframework.data.domain.Pageable;
 
 public interface ZadanieService {
     Optional<Zadanie> getZadanie(Integer zadanieId);
