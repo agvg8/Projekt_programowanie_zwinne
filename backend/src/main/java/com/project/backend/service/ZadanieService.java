@@ -7,7 +7,9 @@ import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 
 public interface ZadanieService {
-    Optional<Zadanie> getZadanie(Integer zadanieId);
+    Optional<Zadanie> getZadanieOptional(Integer zadanieId);
+
+    Zadanie getZadanie(Integer zadanieId);
 
     Zadanie setZadanie(Zadanie zadanie);
 

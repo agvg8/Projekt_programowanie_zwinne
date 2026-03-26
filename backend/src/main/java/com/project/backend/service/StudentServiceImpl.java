@@ -1,17 +1,13 @@
 package com.project.backend.service;
 
-import java.net.URI;
-import java.util.Optional;
-
+import com.project.backend.model.Student;
 import com.project.backend.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
-import com.project.backend.model.Student;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,26 +16,29 @@ public class StudentServiceImpl implements StudentService {
     public final StudentRepository studentRepository;
 
     @Override
-    public Optional<Student> getStudent(Integer studentId) {
+    public Optional<Student> getStudentOptional(Integer studentId) {
+        return studentRepository.findById(studentId);
+    }
 
+    @Override
+    public Student getStudent(Integer studentId) {
+        return getStudentOptional(studentId).orElseThrow(
+                () -> new RuntimeException(("Nie znaleziono studneta z id: " + studentId))
+        );
     }
 
     @Override
     public Student setStudent(Student student) {
+        return studentRepository.save(student);
     }
 
     @Override
-    public void deleteStudent(Student studentId) {
-
-    }
-
-    @Override
-    public Page<Student> getStudenci(Pageable pageable) {
-        return null;
+    public void deleteStudent(Student student) {
+        studentRepository.delete(student);
     }
 
     @Override
     public Page<Student> getStudenci(Pageable pageable) {
-
+        return studentRepository.findAll(pageable);
     }
 }
