@@ -1,11 +1,13 @@
 package com.project.backend.service;
 
-import java.net.URI;
+import com.project.backend.service.RestResponsePage;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.net.URI;
 
 public class ServiceUtil {
     public static <T> RestResponsePage<T> getPage(URI uri, RestClient restClient, ParameterizedTypeReference<RestResponsePage<T>> responseType) {

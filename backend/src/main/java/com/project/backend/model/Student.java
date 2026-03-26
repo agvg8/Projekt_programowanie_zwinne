@@ -8,13 +8,13 @@ import lombok.Setter;
 
 import java.util.Set;
 
-@Setter
-@Getter
-@NoArgsConstructor
 @Entity
 @Table(name = "student",
         indexes = { @Index(name = "idx_nazwisko", columnList = "nazwisko", unique = false),
                 @Index(name = "idx_nr_indeksu", columnList = "nr_indeksu", unique = true) })
+@NoArgsConstructor
+@Getter
+@Setter
 public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +30,7 @@ public class Student {
     @Column(name = "nr_indeksu", nullable = false, length = 20, unique = true)
     private String nrIndeksu;
 
-    @Column(length = 50, nullable = false, unique = true)
+    @Column(length = 50)
     private String email;
 
     @Column(nullable = false)
@@ -39,20 +39,4 @@ public class Student {
     @ManyToMany(mappedBy = "studenci")
     @JsonIgnoreProperties({"studenci"})
     private Set<Projekt> projekty;
-
-    public Student(String imie, String nazwisko, String nrIndeksu, Boolean stacjonarny) {
-        this.imie = imie;
-        this.nazwisko = nazwisko;
-        this.nrIndeksu = nrIndeksu;
-        this.stacjonarny = stacjonarny;
-    }
-
-    public Student(String imie, String nazwisko, String nrIndeksu, String email, Boolean stacjonarny) {
-        this.imie = imie;
-        this.nazwisko = nazwisko;
-        this.nrIndeksu = nrIndeksu;
-        this.email = email;
-        this.stacjonarny = stacjonarny;
-    }
-
 }

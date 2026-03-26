@@ -1,7 +1,9 @@
 package com.project.backend.controller;
 
 import java.net.URI;
+
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,13 +18,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping("/api")
 @Tag(name = "Projekt")
+@RequiredArgsConstructor
 public class ProjektRestController {
-    private ProjektService projektService;
-
-    @Autowired
-    public ProjektRestController(ProjektService projektService) {
-        this.projektService = projektService;
-    }
+    private final ProjektService projektService;
 
     @GetMapping("/projekty/{projektId}")
     public ResponseEntity<Projekt> getProjekt(@PathVariable("projektId") Integer projektId) {

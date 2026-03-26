@@ -10,16 +10,17 @@ import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
-@Setter
-@Getter
-@NoArgsConstructor
 @Entity
 @Table(name = "projekt")
 @EntityListeners(AuditingEntityListener.class)
+@NoArgsConstructor
+@Getter
+@Setter
 public class Projekt {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -56,9 +57,7 @@ public class Projekt {
             inverseJoinColumns = {@JoinColumn(name = "student_id")})
     private Set<Student> studenci;
 
-    public Projekt(String nazwa, String opis) {
-        this.nazwa = nazwa;
-        this.opis = opis;
+    public Projekt(String nazwa, String opis){
+        
     }
-
 }

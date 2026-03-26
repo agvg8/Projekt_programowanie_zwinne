@@ -2,6 +2,9 @@ package com.project.backend.service;
 
 import java.net.URI;
 import java.util.Optional;
+
+import com.project.backend.repository.StudentRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,35 +14,32 @@ import org.springframework.web.client.RestClient;
 import com.project.backend.model.Student;
 
 @Service
+@RequiredArgsConstructor
 public class StudentServiceImpl implements StudentService {
-    private final RestClient restClient;
-    public StudentServiceImpl(RestClient restClient) { this.restClient = restClient; }
 
-    private String getResourcePath() { return "/api/studenci"; }
+    public final StudentRepository studentRepository;
 
     @Override
     public Optional<Student> getStudent(Integer studentId) {
-        return Optional.ofNullable(restClient.get().uri(getResourcePath() + "/" + studentId).retrieve().body(Student.class));
+
     }
 
     @Override
     public Student setStudent(Student student) {
-        if (student.getStudentId() != null) {
-            restClient.put().uri(getResourcePath() + "/" + student.getStudentId()).contentType(MediaType.APPLICATION_JSON).body(student).retrieve().toBodilessEntity();
-            return student;
-        } else {
-            return restClient.post().uri(getResourcePath()).contentType(MediaType.APPLICATION_JSON).body(student).retrieve().body(Student.class);
-        }
     }
 
     @Override
-    public void deleteStudent(Integer studentId) {
-        restClient.delete().uri(getResourcePath() + "/" + studentId).retrieve().toBodilessEntity();
+    public void deleteStudent(Student studentId) {
+
     }
 
     @Override
     public Page<Student> getStudenci(Pageable pageable) {
-        URI uri = ServiceUtil.getURI(getResourcePath(), pageable);
-        return restClient.get().uri(uri).retrieve().body(new ParameterizedTypeReference<RestResponsePage<Student>>() {});
+        return null;
+    }
+
+    @Override
+    public Page<Student> getStudenci(Pageable pageable) {
+
     }
 }
