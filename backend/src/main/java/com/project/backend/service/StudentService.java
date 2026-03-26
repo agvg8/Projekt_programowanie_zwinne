@@ -8,11 +8,13 @@ import org.springframework.data.domain.Pageable;
 import java.util.Optional;
 
 public interface StudentService {
-    Optional<Student> getStudent(Integer studentId);
+    Optional<Student> getStudentOptional(Integer studentId);
+
+    Student getStudent(Integer studentId);
 
     Student setStudent(Student student);
 
-    void deleteStudent(Student studentId);
+    void deleteStudent(Student student);
 
     Page<Student> getStudenci(Pageable pageable);
 }

@@ -19,8 +19,15 @@ public class ProjektServiceImpl implements ProjektService {
     private final ZadanieRepository zadanieRepository;
 
     @Override
-    public Optional<Projekt> getProjekt(Integer projektId) {
+    public Optional<Projekt> getProjektOptional(Integer projektId) {
         return projektRepository.findById(projektId);
+    }
+
+    @Override
+    public Projekt getProjekt(Integer projektId){
+        return getProjektOptional(projektId).orElseThrow(
+                () -> new RuntimeException("Nie znaleziono projektu o id: " + projektId)
+        );
     }
 
     @Override

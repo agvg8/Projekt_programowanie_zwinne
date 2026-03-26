@@ -22,9 +22,17 @@ import com.project.backend.model.Zadanie;
 public class ZadanieServiceImpl implements ZadanieService {
     private static final Logger logger = LoggerFactory.getLogger(ZadanieServiceImpl.class);
     private final ZadanieRepository zadanieRepository;
+
     @Override
-    public Optional<Zadanie> getZadanie(Integer zadanieId) {
+    public Optional<Zadanie> getZadanieOptional(Integer zadanieId) {
         return zadanieRepository.findById(zadanieId);
+    }
+
+    @Override
+    public Zadanie getZadanie(Integer zadanieId) {
+        return getZadanieOptional(zadanieId).orElseThrow(
+                () -> new RuntimeException("Nie znaleziono zadania o id: " + zadanieId)
+        );
     }
 
     @Override
@@ -39,6 +47,6 @@ public class ZadanieServiceImpl implements ZadanieService {
 
     @Override
     public Page<Zadanie> getZadania(Pageable pageable) {
-        return zadanieRepository.findZadania(pageable);
+        return zadanieRepository.findAll(pageable);
     }
 }

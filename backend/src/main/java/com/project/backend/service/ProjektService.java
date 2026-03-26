@@ -6,7 +6,8 @@ import org.springframework.data.domain.Pageable;
 import com.project.backend.model.Projekt;
 
 public interface ProjektService {
-    Optional<Projekt> getProjekt(Integer projektId);
+    Optional<Projekt> getProjektOptional(Integer projektId);
+    Projekt getProjekt(Integer projektId);
     Projekt setProjekt(Projekt projekt);
     void deleteProjekt(Integer projektId);
     Page<Projekt> getProjekty(Pageable pageable);
