@@ -1,7 +1,8 @@
 package com.project.backend.service;
 
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -12,15 +13,10 @@ import com.project.backend.repository.ProjektRepository;
 import com.project.backend.repository.ZadanieRepository;
 
 @Service
+@RequiredArgsConstructor
 public class ProjektServiceImpl implements ProjektService {
-    private ProjektRepository projektRepository;
-    private ZadanieRepository zadanieRepository;
-
-    @Autowired
-    public ProjektServiceImpl(ProjektRepository projektRepository, ZadanieRepository zadanieRepository) {
-        this.projektRepository = projektRepository;
-        this.zadanieRepository = zadanieRepository;
-    }
+    private final ProjektRepository projektRepository;
+    private final ZadanieRepository zadanieRepository;
 
     @Override
     public Optional<Projekt> getProjekt(Integer projektId) {
