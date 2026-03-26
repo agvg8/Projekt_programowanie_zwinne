@@ -2,10 +2,17 @@ package com.project.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "zadanie")
+@NoArgsConstructor
+@Getter
+@Setter
 public class Zadanie {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,25 +35,4 @@ public class Zadanie {
     @JoinColumn(name = "projekt_id")
     @JsonIgnoreProperties({"zadania"})
     private Projekt projekt;
-
-    public Zadanie() {}
-
-    public Zadanie(String nazwa, String opis, Integer kolejnosc) {
-        this.nazwa = nazwa;
-        this.opis = opis;
-        this.kolejnosc = kolejnosc;
-    }
-
-    public Integer getZadanieId() { return zadanieId; }
-    public void setZadanieId(Integer zadanieId) { this.zadanieId = zadanieId; }
-    public String getNazwa() { return nazwa; }
-    public void setNazwa(String nazwa) { this.nazwa = nazwa; }
-    public String getOpis() { return opis; }
-    public void setOpis(String opis) { this.opis = opis; }
-    public Integer getKolejnosc() { return kolejnosc; }
-    public void setKolejnosc(Integer kolejnosc) { this.kolejnosc = kolejnosc; }
-    public LocalDateTime getDataczasDodania() { return dataczasDodania; }
-    public void setDataczasDodania(LocalDateTime dataczasDodania) { this.dataczasDodania = dataczasDodania; }
-    public Projekt getProjekt() { return projekt; }
-    public void setProjekt(Projekt projekt) { this.projekt = projekt; }
 }

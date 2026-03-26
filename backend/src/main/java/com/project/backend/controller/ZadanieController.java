@@ -4,6 +4,7 @@ import com.project.backend.model.Zadanie;
 import com.project.backend.service.ZadanieServiceImpl;
 import com.project.backend.service.ProjektService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,14 +12,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
+@RequiredArgsConstructor
 public class ZadanieController {
     private final ZadanieServiceImpl zadanieService;
     private final ProjektService projektService;
-
-    public ZadanieController(ZadanieServiceImpl zadanieService, ProjektService projektService) {
-        this.zadanieService = zadanieService;
-        this.projektService = projektService;
-    }
 
     @GetMapping("/zadanieList")
     public String zadanieList(Model model, Pageable pageable) {
