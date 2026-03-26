@@ -39,4 +39,19 @@ public class Student {
     @ManyToMany(mappedBy = "studenci")
     @JsonIgnoreProperties({"studenci"})
     private Set<Projekt> projekty;
+
+    public Student(String imie, String nazwisko, String nrIndeksu, String email, Boolean stacjonarny) {
+        this.imie = imie;
+        this.nazwisko = nazwisko;
+        this.nrIndeksu = nrIndeksu;
+        this.email = email;
+        this.stacjonarny = stacjonarny;
+    }
+
+    public Student(String imie, String nazwisko, String nrIndeksu, Boolean stacjonarny) {
+        this.imie = imie;
+        this.nazwisko = nazwisko;
+        this.nrIndeksu = nrIndeksu;
+        this.stacjonarny = stacjonarny;
+    }
 }

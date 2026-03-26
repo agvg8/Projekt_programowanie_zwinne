@@ -58,6 +58,7 @@ public class Projekt {
     private Set<Student> studenci;
 
     public Projekt(String nazwa, String opis){
-        
+        this.nazwa = nazwa;
+        this.opis = opis;
     }
 }
