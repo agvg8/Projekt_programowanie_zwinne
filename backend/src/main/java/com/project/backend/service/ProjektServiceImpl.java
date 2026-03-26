@@ -38,9 +38,7 @@ public class ProjektServiceImpl implements ProjektService {
     @Override
     @Transactional
     public void deleteProjekt(Integer projektId) {
-        for (Zadanie zadanie : zadanieRepository.findZadaniaProjektu(projektId)) {
-            zadanieRepository.delete(zadanie);
-        }
+        zadanieRepository.deleteAll(zadanieRepository.findZadaniaProjektu(projektId));
         projektRepository.deleteById(projektId);
     }
 
