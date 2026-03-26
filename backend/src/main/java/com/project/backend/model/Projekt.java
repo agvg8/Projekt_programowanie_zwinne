@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,6 +38,10 @@ public class Projekt {
     @Column(nullable = false, updatable = false)
     private LocalDateTime dataczas_utworzenia;
 
+    @LastModifiedDate
+    @Column(name = "dataczas_modyfikacji", insertable = false)
+    private LocalDateTime lastModifiedDate;
+
     @Column
     private LocalDateTime data_oddania;
 
@@ -45,6 +50,7 @@ public class Projekt {
     private List<Zadanie> zadania;
 
     @ManyToMany
+    @JsonIgnoreProperties({"projekt"})
     @JoinTable(name = "projekt_student",
             joinColumns = {@JoinColumn(name = "projekt_id")},
             inverseJoinColumns = {@JoinColumn(name = "student_id")})
