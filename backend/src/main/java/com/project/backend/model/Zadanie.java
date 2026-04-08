@@ -35,4 +35,10 @@ public class Zadanie {
     @JoinColumn(name = "projekt_id")
     @JsonIgnoreProperties({"zadania"})
     private Projekt projekt;
+
+    public Zadanie(String nazwa, String opis, Integer kolejnosc) {
+        this.nazwa = nazwa;
+        this.opis = opis;
+        this.kolejnosc = kolejnosc;
+    }
 }
