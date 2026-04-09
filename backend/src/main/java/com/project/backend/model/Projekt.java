@@ -16,7 +16,14 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "projekt")
+@Table(name = "projekt",
+        indexes = {
+        @Index(name = "idx_nazwa_projektu", columnList = "nazwa"),
+        @Index(name = "idx_data_oddania", columnList = "data_oddania"),
+        @Index(name = "idx_projekt_data_utworzenia", columnList = "data_utworzenia")
+    }
+)
+
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor
 @Getter
