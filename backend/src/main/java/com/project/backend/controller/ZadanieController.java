@@ -5,39 +5,55 @@ import com.project.backend.service.ZadanieServiceImpl;
 import com.project.backend.service.ProjektService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+
+@RequestMapping("/api/zadanie")
 @Controller
 @RequiredArgsConstructor
 public class ZadanieController {
     private final ZadanieServiceImpl zadanieService;
     private final ProjektService projektService;
 
-    @GetMapping("/zadanieList")
-    public String zadanieList(Model model, Pageable pageable) {
-        model.addAttribute("zadania", zadanieService.getZadania(pageable).getContent());
-        return "zadanieList";
+    @GetMapping()
+    public ResponseEntity<Page<Zadanie>> getZadania(Pageable pageable) {
+        return ResponseEntity.ok(zadanieService.getZadania(pageable));
     }
 
-    @GetMapping("/zadanieEdit")
-    public String zadanieEdit(@RequestParam(name="zadanieId", required = false) Integer zadanieId, Model model) {
-        if(zadanieId != null) {
-            model.addAttribute("zadanie", zadanieService.getZadanieOptional(zadanieId).orElse(new Zadanie()));
-        } else {
-            model.addAttribute("zadanie", new Zadanie());
-        }
-        model.addAttribute("projekty", projektService.getProjekty(Pageable.unpaged()).getContent());
-        return "zadanieEdit";
+    @PutMapping("/{zadanieId}")
+    public ResponseEntity<Void> updateZadanie(@Valid @RequestBody Zadanie zadanie, @PathVariable("zadanieId") Integer zadanieId) {
+        return zadanieService.getZadanieOptional(zadanieId)
+                .map(p -> {
+                    zadanie.setZadanieId(zadanieId);
+                    zadanieService.setZadanie(zadanie);
+                    return new ResponseEntity<Void>(HttpStatus.OK);
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/zadanieEdit")
-    public String zadanieSave(@ModelAttribute @Valid Zadanie zadanie, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) return "zadanieEdit";
+    @GetMapping("/{zadanieId}")
+    public ResponseEntity<Zadanie> getZadanie(@PathVariable("zadanieId") Integer zadanieId) {
+        return zadanieService.getZadanieOptional(zadanieId)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PostMapping()
+    public ResponseEntity<Void> createZadanie(@Valid @RequestBody Zadanie zadanie){
         zadanieService.setZadanie(zadanie);
-        return "redirect:/zadanieList";
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @DeleteMapping("/{zadanieId}")
+    public ResponseEntity<Void> deleteZadanie(@PathVariable("zadanieId") Integer zadanieId){
+        return zadanieService.getZadanieOptional(zadanieId).map(p -> {
+            zadanieService.deleteZadanie(zadanieId);
+            return new ResponseEntity<Void>(HttpStatus.OK);
+        }).orElseGet(() -> ResponseEntity.notFound().build());
     }
 }
