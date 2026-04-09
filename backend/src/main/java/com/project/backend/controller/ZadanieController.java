@@ -26,7 +26,7 @@ public class ZadanieController {
     @GetMapping("/zadanieEdit")
     public String zadanieEdit(@RequestParam(name="zadanieId", required = false) Integer zadanieId, Model model) {
         if(zadanieId != null) {
-            model.addAttribute("zadanie", zadanieService.getZadanie(zadanieId).orElse(new Zadanie()));
+            model.addAttribute("zadanie", zadanieService.getZadanieOptional(zadanieId).orElse(new Zadanie()));
         } else {
             model.addAttribute("zadanie", new Zadanie());
         }

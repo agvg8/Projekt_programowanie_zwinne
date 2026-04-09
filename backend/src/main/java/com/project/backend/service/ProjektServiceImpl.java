@@ -8,7 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.project.backend.model.Projekt;
-import com.project.backend.model.Zadanie;
 import com.project.backend.repository.ProjektRepository;
 import com.project.backend.repository.ZadanieRepository;
 
@@ -38,9 +37,7 @@ public class ProjektServiceImpl implements ProjektService {
     @Override
     @Transactional
     public void deleteProjekt(Integer projektId) {
-        for (Zadanie zadanie : zadanieRepository.findZadaniaProjektu(projektId)) {
-            zadanieRepository.delete(zadanie);
-        }
+        zadanieRepository.deleteAll(zadanieRepository.findZadaniaProjektu(projektId));
         projektRepository.deleteById(projektId);
     }
 
