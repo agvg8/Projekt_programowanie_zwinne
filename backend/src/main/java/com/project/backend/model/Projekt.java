@@ -44,7 +44,7 @@ public class Projekt {
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
-    private LocalDateTime dataczas_utworzenia;
+    private LocalDateTime data_utworzenia;
 
     @LastModifiedDate
     @Column(name = "dataczas_modyfikacji", insertable = false)
