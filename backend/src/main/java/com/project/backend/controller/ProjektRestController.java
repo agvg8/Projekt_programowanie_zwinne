@@ -1,30 +1,29 @@
 package com.project.backend.controller;
 
-import java.net.URI;
-
+import com.project.backend.model.Projekt;
+import com.project.backend.service.ProjektServiceImpl;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import com.project.backend.model.Projekt;
-import com.project.backend.service.ProjektService;
-import io.swagger.v3.oas.annotations.tags.Tag;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping("/api")
 @Tag(name = "Projekt")
 @RequiredArgsConstructor
 public class ProjektRestController {
-    private final ProjektService projektService;
+    private final ProjektServiceImpl projektService;
 
     @GetMapping("/projekty/{projektId}")
     public ResponseEntity<Projekt> getProjekt(@PathVariable("projektId") Integer projektId) {
-        return ResponseEntity.of(projektService.getProjekt(projektId));
+        return ResponseEntity.ok(projektService.getProjekt(projektId));
     }
 
     @PostMapping("/projekty")
@@ -37,7 +36,7 @@ public class ProjektRestController {
 
     @PutMapping("/projekty/{projektId}")
     public ResponseEntity<Void> updateProjekt(@Valid @RequestBody Projekt projekt, @PathVariable("projektId") Integer projektId) {
-        return projektService.getProjekt(projektId)
+        return projektService.getProjektOptional(projektId)
                 .map(p -> {
                     projekt.setProjektId(projektId);
                     projektService.setProjekt(projekt);
@@ -48,7 +47,7 @@ public class ProjektRestController {
 
     @DeleteMapping("/projekty/{projektId}")
     public ResponseEntity<Void> deleteProjekt(@PathVariable("projektId") Integer projektId) {
-        return projektService.getProjekt(projektId).map(p -> {
+        return projektService.getProjektOptional(projektId).map(p -> {
             projektService.deleteProjekt(projektId);
             return new ResponseEntity<Void>(HttpStatus.OK);
         }).orElseGet(() -> ResponseEntity.notFound().build());

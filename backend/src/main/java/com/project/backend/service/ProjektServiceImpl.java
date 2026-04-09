@@ -8,7 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.project.backend.model.Projekt;
-import com.project.backend.model.Zadanie;
 import com.project.backend.repository.ProjektRepository;
 import com.project.backend.repository.ZadanieRepository;
 
