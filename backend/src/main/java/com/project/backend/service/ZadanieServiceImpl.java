@@ -50,4 +50,14 @@ public class ZadanieServiceImpl implements ZadanieService {
         zadanie.setStatus(status);
         return zadanieRepository.save(zadanie);
     }
+
+    @Override
+    public Page<Zadanie> getZadaniaByStatus(StatusZadania status, Pageable pageable) {
+        return zadanieRepository.findByStatus(status, pageable);
+    }
+
+    @Override
+    public Page<Zadanie> getZadaniaByProjekt(Integer projektId, Pageable pageable) {
+        return zadanieRepository.findByProjekt_ProjektId(projektId, pageable);
+    }
 }

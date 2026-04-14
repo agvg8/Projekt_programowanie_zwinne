@@ -19,4 +19,8 @@ public interface ZadanieService {
     Page<Zadanie> getZadania(Pageable pageable);
 
     Zadanie updateStatus(Integer zadanieId, StatusZadania status);
+
+    Page<Zadanie> getZadaniaByStatus(StatusZadania status, Pageable pageable);
+
+    Page<Zadanie> getZadaniaByProjekt(Integer projektId, Pageable pageable);
 }

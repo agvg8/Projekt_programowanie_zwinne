@@ -19,5 +19,4 @@ public interface ZadanieRepository extends JpaRepository<Zadanie, Integer> {
 
     Page<Zadanie> findByStatus(StatusZadania status, Pageable pageable);
     Page<Zadanie> findByProjekt_ProjektId(Integer projektId, Pageable pageable);
-
 }
