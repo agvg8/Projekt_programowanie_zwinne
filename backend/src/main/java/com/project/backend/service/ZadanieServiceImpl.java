@@ -2,6 +2,7 @@ package com.project.backend.service;
 
 import java.util.Optional;
 
+import com.project.backend.model.StatusZadania;
 import com.project.backend.repository.ZadanieRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -42,5 +43,11 @@ public class ZadanieServiceImpl implements ZadanieService {
     @Override
     public Page<Zadanie> getZadania(Pageable pageable) {
         return zadanieRepository.findAll(pageable);
+    }
+
+    public Zadanie updateStatus(Integer zadanieId, StatusZadania status) {
+        Zadanie zadanie = getZadanie(zadanieId);
+        zadanie.setStatus(status);
+        return zadanieRepository.save(zadanie);
     }
 }
