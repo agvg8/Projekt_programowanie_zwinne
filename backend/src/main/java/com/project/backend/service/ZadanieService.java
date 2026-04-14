@@ -1,5 +1,6 @@
 package com.project.backend.service;
 
+import com.project.backend.model.StatusZadania;
 import com.project.backend.model.Zadanie;
 import org.springframework.data.domain.Page;
 
@@ -16,4 +17,6 @@ public interface ZadanieService {
     void deleteZadanie(Integer zadanieId);
 
     Page<Zadanie> getZadania(Pageable pageable);
+
+    Zadanie updateStatus(Integer zadanieId, StatusZadania status);
 }
