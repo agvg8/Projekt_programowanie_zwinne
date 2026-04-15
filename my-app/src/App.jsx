@@ -5,15 +5,41 @@ import Sidebar from "./components/Sidebar";
 import TopBar from "./components/TopBar";
 import TaskList from "./components/TaskList";
 import Settings from "./pages/Settings";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 import { tasks } from "./data/tasks";
 
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authPage, setAuthPage] = useState("login");
   const [currentPage, setCurrentPage] = useState("dashboard");
   const [background, setBackground] = useState("/bg1.jpg");
 
   useEffect(() => {
     document.body.style.backgroundImage = `url(${background})`;
   }, [background]);
+
+  const handleLogin = (username, password) => {
+    if (username === "admin" && password === "admin") {
+      setIsAuthenticated(true);
+      return { success: true };
+    }
+
+    return { success: false, message: "Nieprawidlowy login lub haslo" };
+  };
+
+  if (!isAuthenticated) {
+    if (authPage === "register") {
+      return <RegisterPage onShowLogin={() => setAuthPage("login")} />;
+    }
+
+    return (
+      <LoginPage
+        onLogin={handleLogin}
+        onShowRegister={() => setAuthPage("register")}
+      />
+    );
+  }
 
   return (
     <div
