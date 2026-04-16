@@ -7,6 +7,7 @@ import TaskList from "./components/TaskList";
 import Settings from "./pages/Settings";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import ProjectDetails from "./pages/ProjectDetails";
 import { tasks } from "./data/tasks";
 
 export default function App() {
@@ -14,6 +15,7 @@ export default function App() {
   const [authPage, setAuthPage] = useState("login");
   const [currentPage, setCurrentPage] = useState("dashboard");
   const [background, setBackground] = useState("/bg1.jpg");
+  const [selectedTask, setSelectedTask] = useState(null);
 
   useEffect(() => {
     document.body.style.backgroundImage = `url(${background})`;
@@ -56,10 +58,22 @@ export default function App() {
           {currentPage === "dashboard" && (
             <>
               <h1 className="title">My Projects</h1>
-              <TaskList tasks={tasks} />
+              <TaskList
+                tasks={tasks}
+                onTaskClick={(task) => {
+                setSelectedTask(task);
+                setCurrentPage("details");
+                }}
+                />
             </>
           )}
 
+          {currentPage === "details" && selectedTask && (
+            <ProjectDetails
+            task={selectedTask}
+            onBack={() => setCurrentPage("dashboard")}
+            />
+           )}
 
           {currentPage === "settings" && (
             <Settings setBackground={setBackground} />
