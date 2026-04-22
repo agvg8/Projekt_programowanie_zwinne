@@ -15,4 +15,6 @@ public interface ZadanieRepository extends JpaRepository<Zadanie, Integer> {
     @Query("SELECT z FROM Zadanie z WHERE z.projekt.projektId = :projektId")
     List<Zadanie> findZadaniaProjektu(@Param("projektId") Integer projektId);
 
+    long countByProjekt_ProjektId(Integer projektId);
+
 }
