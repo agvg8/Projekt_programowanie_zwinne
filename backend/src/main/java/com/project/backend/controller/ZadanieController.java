@@ -63,11 +63,11 @@ public class ZadanieController {
             @PathVariable Integer zadanieId,
             @RequestParam StatusZadania status
     ) {
-        return zadanieService.getZadanieOptional(zadanieId)
-                .map(z -> {
-                    zadanieService.updateStatus(zadanieId, status);
-                    return new ResponseEntity<Void>(HttpStatus.OK);
-                })
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        try {
+            zadanieService.updateStatus(zadanieId, status);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
