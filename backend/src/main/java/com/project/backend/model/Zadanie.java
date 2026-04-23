@@ -37,7 +37,7 @@ public class Zadanie {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private StatusZadania status = StatusZadania.MEDIUM;
+    private StatusZadania status;
 
     @ManyToOne
     @JoinColumn(name = "projekt_id")
