@@ -1,6 +1,7 @@
 package com.project.backend.controller;
 
 import com.project.backend.model.Projekt;
+import com.project.backend.model.Zadanie;
 import com.project.backend.service.ProjektService;
 import com.project.backend.service.ProjektServiceImpl;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -11,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/projekt")
@@ -60,5 +63,10 @@ public class ProjektRestController {
     @GetMapping(params = "nazwa")
     public Page<Projekt> getProjektyByNazwa(@RequestParam(name = "nazwa") String nazwa, Pageable pageable) {
         return projektService.searchByNazwa(nazwa, pageable);
+    }
+
+    @GetMapping("/{projektId}/zadania")
+    public List<Zadanie> getZadaniaByProjekt(@PathVariable Integer projektId){
+        return projektService.getProjekt(projektId).getZadania();
     }
 }
