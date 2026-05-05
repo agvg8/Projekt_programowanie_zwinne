@@ -9,7 +9,11 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "zadanie")
+@Table(name = "zadanie",
+    indexes = {
+        @Index(name = "idx_zadanie_status", columnList = "status"),
+        @Index(name = "idx_zadanie_projekt", columnList = "projekt_id")
+})
 @NoArgsConstructor
 @Getter
 @Setter
@@ -30,6 +34,10 @@ public class Zadanie {
 
     @Column(name = "dataczas_dodania")
     private LocalDateTime dataczasDodania;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private StatusZadania status;
 
     @ManyToOne
     @JoinColumn(name = "projekt_id")
