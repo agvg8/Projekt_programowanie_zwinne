@@ -12,6 +12,6 @@ public interface ProjektRepository extends JpaRepository<Projekt, Integer> {
     Page<Projekt> findByNazwaContainingIgnoreCase(String nazwa, Pageable pageable);
     List<Projekt> findByNazwaContainingIgnoreCase(String nazwa);
 
-    @Query("SELECT DISTINCT p FROM Projekt p LEFT JOIN FETCH p.studenci")
-    List<Projekt> findAllWithStudents();
+    @Query("SELECT DISTINCT p FROM Projekt p LEFT JOIN FETCH p.uzytkownicy")
+    List<Projekt> findAllWithUzytkownicy();
 }

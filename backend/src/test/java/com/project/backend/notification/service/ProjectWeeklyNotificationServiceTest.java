@@ -1,7 +1,7 @@
 package com.project.backend.notification.service;
 
 import com.project.backend.model.Projekt;
-import com.project.backend.model.Student;
+import com.project.backend.model.Uzytkownik;
 import com.project.backend.notification.config.WeeklyNotificationProperties;
 import com.project.backend.notification.repository.ProjektStatusNotificationRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -99,9 +99,9 @@ class ProjectWeeklyNotificationServiceTest {
         Projekt projekt = new Projekt();
         projekt.setProjektId(id);
         projekt.setNazwa(nazwa);
-        Student student = new Student();
-        student.setEmail("one@test.local");
-        projekt.setStudenci(Set.of(student));
+        Uzytkownik uzytkownik = new Uzytkownik();
+        uzytkownik.setEmail("one@test.local");
+        projekt.setUzytkownicy(Set.of(uzytkownik));
         return projekt;
     }
 }

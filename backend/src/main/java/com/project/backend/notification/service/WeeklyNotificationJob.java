@@ -23,7 +23,7 @@ public class WeeklyNotificationJob {
             return;
         }
 
-        for (Projekt projekt : projektRepository.findAllWithStudents()) {
+        for (Projekt projekt : projektRepository.findAllWithUzytkownicy()) {
             WeeklyNotificationResult result = projectWeeklyNotificationService.notifyProject(projekt, properties.isDryRun());
             logger.info(
                     "Weekly notification processed for projectId={}, status={}, recipients={}",
