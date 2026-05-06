@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RequestMapping("/api/zadanie")
+@CrossOrigin(origins = "http://localhost:5173")
 @Controller
 @RequiredArgsConstructor
 public class ZadanieController {
