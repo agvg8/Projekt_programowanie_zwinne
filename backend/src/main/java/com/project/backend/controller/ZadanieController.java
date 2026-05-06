@@ -1,5 +1,6 @@
 package com.project.backend.controller;
 
+import com.project.backend.model.StatusZadania;
 import com.project.backend.model.Zadanie;
 import com.project.backend.service.ZadanieServiceImpl;
 import com.project.backend.service.ProjektService;
@@ -55,5 +56,18 @@ public class ZadanieController {
             zadanieService.deleteZadanie(zadanieId);
             return new ResponseEntity<Void>(HttpStatus.OK);
         }).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PatchMapping("/{zadanieId}/status")
+    public ResponseEntity<Void> updateStatus(
+            @PathVariable Integer zadanieId,
+            @RequestParam StatusZadania status
+    ) {
+        try {
+            zadanieService.updateStatus(zadanieId, status);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
