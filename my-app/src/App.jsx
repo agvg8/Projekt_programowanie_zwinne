@@ -8,7 +8,7 @@ import Settings from "./pages/Settings";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ProjectDetails from "./pages/ProjectDetails";
-import { tasks } from "./data/tasks";
+import { fetchProjects } from "./api/projektApi";
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -16,10 +16,15 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState("dashboard");
   const [background, setBackground] = useState("/bg1.jpg");
   const [selectedTask, setSelectedTask] = useState(null);
+  const [projects, setProjects] = useState([]);
 
   useEffect(() => {
     document.body.style.backgroundImage = `url(${background})`;
   }, [background]);
+
+  useEffect(() => {
+    fetchProjects().then(setProjects);
+  }, []);
 
   const handleLogin = (username, password) => {
     if (username === "admin" && password === "admin") {
@@ -59,7 +64,7 @@ export default function App() {
             <>
               <h1 className="title">My Projects</h1>
               <TaskList
-                tasks={tasks}
+                tasks={projects}
                 onTaskClick={(task) => {
                 setSelectedTask(task);
                 setCurrentPage("details");
@@ -70,7 +75,7 @@ export default function App() {
 
           {currentPage === "details" && selectedTask && (
             <ProjectDetails
-            task={selectedTask}
+            project={selectedTask}
             onBack={() => setCurrentPage("dashboard")}
             />
            )}

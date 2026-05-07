@@ -51,4 +51,17 @@ public class Zadanie {
         this.opis = opis;
         this.kolejnosc = kolejnosc;
     }
+
+    @Override
+    public String toString() {
+        return "Zadanie{" +
+                "zadanieId=" + zadanieId +
+                ", nazwa='" + nazwa + '\'' +
+                ", opis='" + opis + '\'' +
+                ", kolejnosc=" + kolejnosc +
+                ", dataczasDodania=" + dataczasDodania +
+                ", status=" + status +
+                ", projekt=" + projekt +
+                '}';
+    }
 }

@@ -17,6 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/projekt")
+@CrossOrigin(origins = "http://localhost:5173")
 @Tag(name = "Projekt")
 @RequiredArgsConstructor
 public class ProjektRestController {

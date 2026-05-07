@@ -48,6 +48,7 @@ public class ZadanieServiceImpl implements ZadanieService {
     public Zadanie updateStatus(Integer zadanieId, StatusZadania status) {
         Zadanie zadanie = getZadanie(zadanieId);
         zadanie.setStatus(status);
+        logger.info(zadanie.toString());
         return zadanieRepository.save(zadanie);
     }
 
