@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,13 +47,13 @@ public class ZadanieController {
     }
 
     @PostMapping()
-    public ResponseEntity<Void> createZadanie(@Valid @RequestBody Zadanie zadanie){
+    public ResponseEntity<Void> createZadanie(@Valid @RequestBody Zadanie zadanie) {
         zadanieService.setZadanie(zadanie);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @DeleteMapping("/{zadanieId}")
-    public ResponseEntity<Void> deleteZadanie(@PathVariable("zadanieId") Integer zadanieId){
+    public ResponseEntity<Void> deleteZadanie(@PathVariable("zadanieId") Integer zadanieId) {
         return zadanieService.getZadanieOptional(zadanieId).map(p -> {
             zadanieService.deleteZadanie(zadanieId);
             return new ResponseEntity<Void>(HttpStatus.OK);
@@ -66,6 +67,19 @@ public class ZadanieController {
     ) {
         try {
             zadanieService.updateStatus(zadanieId, status);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PatchMapping("/{zadanieId}/wykonane")
+    public ResponseEntity<Void> updateWykonanieZadania(
+            @PathVariable Integer zadanieId,
+            @RequestParam Boolean wykonane
+    ) {
+        try {
+            zadanieService.updateWykonane(zadanieId, wykonane);
             return ResponseEntity.ok().build();
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();

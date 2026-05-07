@@ -1,6 +1,7 @@
 package com.project.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.annotation.PostConstruct;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,6 +39,7 @@ public class Zadanie {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private StatusZadania status;
+    private Boolean wykonane;
 
     @ManyToOne
     @JoinColumn(name = "projekt_id")

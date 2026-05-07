@@ -59,10 +59,10 @@ public class Projekt {
 
     @ManyToMany
     @JsonIgnoreProperties({"projekt"})
-    @JoinTable(name = "projekt_student",
+    @JoinTable(name = "projekt_uzytkownik",
             joinColumns = {@JoinColumn(name = "projekt_id")},
-            inverseJoinColumns = {@JoinColumn(name = "student_id")})
-    private Set<Student> studenci;
+            inverseJoinColumns = {@JoinColumn(name = "uzytkownik_id")})
+    private Set<Uzytkownik> uzytkownicy;
 
     public Projekt(String nazwa, String opis){
         this.nazwa = nazwa;
