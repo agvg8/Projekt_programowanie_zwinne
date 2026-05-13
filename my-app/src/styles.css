@@ -546,7 +546,7 @@ body, html {
   background: #ffe5e5;
 }
 
-.task-status {
+.task-priority {
   font-size: 12px;
   font-weight: bold;
   opacity: 0.7;
