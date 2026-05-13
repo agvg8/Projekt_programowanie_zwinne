@@ -1,9 +1,11 @@
+import keycloak from "../keycloak.js";
+
 const BASE_URL = "http://localhost:8081/api/projekt";
 
 export async function fetchProjects() {
     const res = await fetch(BASE_URL, {
         headers: {
-            Authorization: "Basic " + btoa("user:password")
+            Authorization: `Bearer ${keycloak.token}`
         }
     });
     const data = await res.json();
@@ -23,7 +25,7 @@ export async function fetchProjectTasks(projectId) {
         `${BASE_URL}/${projectId}/zadania`,
         {
             headers: {
-                Authorization: "Basic " + btoa("user:password")
+                Authorization: `Bearer ${keycloak.token}`
             }
         }
     );

@@ -1,9 +1,11 @@
+import keycloak from "../keycloak.js";
+
 const BASE_URL = "http://localhost:8081/api/zadanie";
 
 export async function fetchTasks() {
     const res = await fetch(BASE_URL, {
         headers: {
-            Authorization: "Basic " + btoa("admin:admin")
+            Authorization: `Bearer ${keycloak.token}`
         }
     });
     const data = await res.json();
@@ -16,7 +18,7 @@ export async function updateTaskPriorytet(id, status) {
         `http://localhost:8081/api/zadanie/${id}/priorytet?priorytet=${status}`,
         { method: "PATCH",
             headers: {
-                Authorization: "Basic " + btoa("admin:admin")
+                Authorization: `Bearer ${keycloak.token}`
             }}
     );
 }
