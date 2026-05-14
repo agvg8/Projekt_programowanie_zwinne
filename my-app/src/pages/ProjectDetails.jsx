@@ -1,12 +1,12 @@
 import {useState, useMemo, useEffect} from "react";
-import { updateTaskStatus } from "../api/zadanieApi";
+import { updateTaskPriorytet } from "../api/zadanieApi";
 import {fetchProjectTasks} from "../api/projektApi.js";
 
 export default function ProjectDetails({ project, onBack }) {
 
-    // map backend status → UI style
-    const mapStatus = (status) => {
-        switch (status) {
+    // map backend priorytet → UI style
+    const mapPriority = (priority) => {
+        switch (priority) {
             case "LOW":
                 return "low";
             case "MEDIUM":
@@ -27,8 +27,8 @@ export default function ProjectDetails({ project, onBack }) {
                 id: z.zadanieId,
                 text: z.nazwa,
                 opis: z.opis,
-                status: z.status,
-                uiStatus: mapStatus(z.status),
+                priority: z.priorytet,
+                uiPriority: mapPriority(z.priorytet),
             })));
         });
     }, [project.id]);
@@ -37,21 +37,21 @@ export default function ProjectDetails({ project, onBack }) {
     const progress = useMemo(() => {
         if (!tasks.length) return 0;
 
-        const done = tasks.filter((t) => t.status === "HIGH").length;
+        const done = tasks.filter((t) => t.priority === "HIGH").length;
         return Math.round((done / tasks.length) * 100);
     }, [tasks]);
 
-    // zmiana statusu
-    const cycleStatus = async (taskId, currentStatus) => {
+    // zmiana priorytetu
+    const cyclePriority = async (taskId, currentPriority) => {
         const next =
-            currentStatus === "LOW"
+            currentPriority === "LOW"
                 ? "MEDIUM"
-                : currentStatus === "MEDIUM"
+                : currentPriority === "MEDIUM"
                     ? "HIGH"
                     : "LOW";
 
         // update backend
-        await updateTaskStatus(taskId, next);
+        await updateTaskPriorytet(taskId, next);
 
         // update UI
         setTasks((prev) =>
@@ -59,8 +59,8 @@ export default function ProjectDetails({ project, onBack }) {
                 t.id === taskId
                     ? {
                         ...t,
-                        status: next,
-                        uiStatus: mapStatus(next),
+                        priority: next,
+                        uiPriority: mapPriority(next),
                     }
                     : t
             )
@@ -128,9 +128,9 @@ export default function ProjectDetails({ project, onBack }) {
                     {tasks.map((task) => (
                         <div
                             key={task.id}
-                            className={`task-item ${task.uiStatus}`}
+                            className={`task-item ${task.uiPriority}`}
                             onClick={() =>
-                                cycleStatus(task.id, task.status)
+                                cyclePriority(task.id, task.priority)
                             }
                         >
 
@@ -146,8 +146,8 @@ export default function ProjectDetails({ project, onBack }) {
                             </div>
 
                             {/* RIGHT */}
-                            <div className="task-status">
-                                {task.status}
+                            <div className="task-priority">
+                                {task.priority}
                             </div>
 
                         </div>

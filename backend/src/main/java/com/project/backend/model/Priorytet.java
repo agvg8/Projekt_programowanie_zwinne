@@ -1,6 +1,6 @@
 package com.project.backend.model;
 
-public enum StatusZadania {
+public enum Priorytet {
     HIGH,
     MEDIUM,
     LOW

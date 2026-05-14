@@ -1,6 +1,7 @@
 package com.project.backend.controller;
 
-import com.project.backend.model.StatusZadania;
+import com.project.backend.model.Priorytet;
+import com.project.backend.model.Status;
 import com.project.backend.model.Zadanie;
 import com.project.backend.service.ZadanieServiceImpl;
 import com.project.backend.service.ProjektService;
@@ -10,7 +11,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -63,7 +63,7 @@ public class ZadanieController {
     @PatchMapping("/{zadanieId}/status")
     public ResponseEntity<Void> updateStatus(
             @PathVariable Integer zadanieId,
-            @RequestParam StatusZadania status
+            @RequestParam Status status
     ) {
         try {
             zadanieService.updateStatus(zadanieId, status);
@@ -73,13 +73,13 @@ public class ZadanieController {
         }
     }
 
-    @PatchMapping("/{zadanieId}/wykonane")
-    public ResponseEntity<Void> updateWykonanieZadania(
+    @PatchMapping("/{zadanieId}/priorytet")
+    public ResponseEntity<Void> updatePriorytet(
             @PathVariable Integer zadanieId,
-            @RequestParam Boolean wykonane
-    ) {
+            @RequestParam Priorytet priorytet
+            ) {
         try {
-            zadanieService.updateWykonane(zadanieId, wykonane);
+            zadanieService.updatePriorytet(zadanieId, priorytet);
             return ResponseEntity.ok().build();
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();

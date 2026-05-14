@@ -1,6 +1,6 @@
 package com.project.backend.service;
 
-import com.project.backend.model.StatusZadania;
+import com.project.backend.model.Status;
 import com.project.backend.model.Zadanie;
 import org.springframework.data.domain.Page;
 
@@ -18,9 +18,9 @@ public interface ZadanieService {
 
     Page<Zadanie> getZadania(Pageable pageable);
 
-    Zadanie updateStatus(Integer zadanieId, StatusZadania status);
+    Zadanie updateStatus(Integer zadanieId, Status status);
 
-    Page<Zadanie> getZadaniaByStatus(StatusZadania status, Pageable pageable);
+    Page<Zadanie> getZadaniaByStatus(Status status, Pageable pageable);
 
     Page<Zadanie> getZadaniaByProjekt(Integer projektId, Pageable pageable);
 }

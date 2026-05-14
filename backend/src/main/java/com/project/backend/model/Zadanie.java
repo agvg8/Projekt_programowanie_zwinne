@@ -38,8 +38,10 @@ public class Zadanie {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private StatusZadania status;
-    private Boolean wykonane;
+    private Priorytet priorytet;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Status status;
 
     @ManyToOne
     @JoinColumn(name = "projekt_id")
