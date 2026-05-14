@@ -3,6 +3,7 @@ package com.project.backend;
 import com.project.backend.controller.ProjektRestController;
 import com.project.backend.model.Projekt;
 import com.project.backend.service.ProjektServiceImpl;
+import com.project.backend.service.ProjektZalacznikService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,6 +29,9 @@ public class ProjektRestControllerUnitTest {
 
     @Mock
     private ProjektServiceImpl mockProjektService;
+
+    @Mock
+    private ProjektZalacznikService mockProjektZalacznikService;
 
     @InjectMocks
     private ProjektRestController projectController;

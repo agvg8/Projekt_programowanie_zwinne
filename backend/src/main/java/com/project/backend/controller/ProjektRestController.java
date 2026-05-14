@@ -1,17 +1,24 @@
 package com.project.backend.controller;
 
+import com.project.backend.dto.ProjektZalacznikDto;
 import com.project.backend.model.Projekt;
+import com.project.backend.model.ProjektZalacznik;
 import com.project.backend.model.Zadanie;
 import com.project.backend.service.ProjektService;
-import com.project.backend.service.ProjektServiceImpl;
+import com.project.backend.service.ProjektZalacznikService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -22,6 +29,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProjektRestController {
     private final ProjektService projektService;
+    private final ProjektZalacznikService projektZalacznikService;
 
     @GetMapping("/{projektId}")
     public ResponseEntity<Projekt> getProjekt(@PathVariable("projektId") Integer projektId) {
@@ -69,5 +77,46 @@ public class ProjektRestController {
     @GetMapping("/{projektId}/zadania")
     public List<Zadanie> getZadaniaByProjekt(@PathVariable Integer projektId){
         return projektService.getProjekt(projektId).getZadania();
+    }
+
+    @PostMapping(value = "/{projektId}/zalaczniki", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ProjektZalacznikDto> uploadZalacznik(
+            @PathVariable Integer projektId,
+            @RequestParam("file") MultipartFile file,
+            HttpServletRequest request
+    ) {
+        System.out.println("Content-Type: " + request.getContentType());
+        System.out.println("File: " + file.getOriginalFilename() + ", size: " + file.getSize());
+
+        ProjektZalacznik zalacznik = projektZalacznikService.addZalacznik(projektId, file);
+        String downloadUrl = "/api/projekt/" + projektId + "/zalaczniki/" + zalacznik.getZalacznikId();
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .header(HttpHeaders.LOCATION, downloadUrl)
+                .body(ProjektZalacznikDto.from(zalacznik, downloadUrl));
+    }
+
+    @GetMapping("/{projektId}/zalaczniki")
+    public List<ProjektZalacznikDto> getZalaczniki(@PathVariable Integer projektId) {
+        return projektZalacznikService.getZalaczniki(projektId).stream()
+                .map(z -> ProjektZalacznikDto.from(
+                        z,
+                        "/api/projekt/" + projektId + "/zalaczniki/" + z.getZalacznikId()
+                ))
+                .toList();
+    }
+
+    @GetMapping("/{projektId}/zalaczniki/{zalacznikId}")
+    public ResponseEntity<Resource> downloadZalacznik(
+            @PathVariable Integer projektId,
+            @PathVariable Integer zalacznikId
+    ) {
+        ProjektZalacznikService.DownloadedAttachment attachment =
+                projektZalacznikService.downloadZalacznik(projektId, zalacznikId);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(attachment.getContentType()))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + attachment.getFilename() + "\"")
+                .body(attachment.getResource());
     }
 }
