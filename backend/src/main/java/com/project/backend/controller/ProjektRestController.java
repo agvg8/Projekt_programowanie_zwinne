@@ -115,8 +115,8 @@ public class ProjektRestController {
                 projektZalacznikService.downloadZalacznik(projektId, zalacznikId);
 
         return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(attachment.getContentType()))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + attachment.getFilename() + "\"")
-                .body(attachment.getResource());
+                .contentType(MediaType.parseMediaType(attachment.contentType()))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + attachment.filename() + "\"")
+                .body(attachment.resource());
     }
 }

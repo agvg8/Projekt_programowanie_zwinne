@@ -44,7 +44,7 @@ public class ProjektZalacznikServiceImpl implements ProjektZalacznikService {
     @Override
     public ProjektZalacznik addZalacznik(Integer projektId, MultipartFile file) {
         if (file == null || file.isEmpty()) {
-            throw new HttpException(HttpStatus.BAD_REQUEST, new HttpHeaders());
+            throw new HttpException("Plik nie może być pusty!");
         }
         if (file.getSize() > maxSizeBytes) {
             throw new HttpException(HttpStatus.PAYLOAD_TOO_LARGE, new HttpHeaders());

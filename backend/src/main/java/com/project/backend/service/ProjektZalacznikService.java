@@ -11,28 +11,7 @@ public interface ProjektZalacznikService {
     List<ProjektZalacznik> getZalaczniki(Integer projektId);
     DownloadedAttachment downloadZalacznik(Integer projektId, Integer zalacznikId);
 
-    class DownloadedAttachment {
-        private final Resource resource;
-        private final String contentType;
-        private final String filename;
-
-        public DownloadedAttachment(Resource resource, String contentType, String filename) {
-            this.resource = resource;
-            this.contentType = contentType;
-            this.filename = filename;
-        }
-
-        public Resource getResource() {
-            return resource;
-        }
-
-        public String getContentType() {
-            return contentType;
-        }
-
-        public String getFilename() {
-            return filename;
-        }
+    record DownloadedAttachment(Resource resource, String contentType, String filename) {
     }
 }
 
