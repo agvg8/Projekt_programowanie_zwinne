@@ -85,8 +85,6 @@ public class ProjektRestController {
             @RequestParam("file") MultipartFile file,
             HttpServletRequest request
     ) {
-        System.out.println("Content-Type: " + request.getContentType());
-        System.out.println("File: " + file.getOriginalFilename() + ", size: " + file.getSize());
 
         ProjektZalacznik zalacznik = projektZalacznikService.addZalacznik(projektId, file);
         String downloadUrl = "/api/projekt/" + projektId + "/zalaczniki/" + zalacznik.getZalacznikId();
