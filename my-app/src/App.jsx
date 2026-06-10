@@ -10,6 +10,8 @@ import Settings from "./pages/Settings";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ProjectDetails from "./pages/ProjectDetails";
+import AdminPanel from "./pages/AdminPanel";
+import EditStudent from "./pages/EditStudent";
 import { fetchProjects } from "./api/projektApi";
 
 export default function App() {
@@ -19,6 +21,7 @@ export default function App() {
   const [background, setBackground] = useState("/bg1.jpg");
   const [selectedTask, setSelectedTask] = useState(null);
   const [projects, setProjects] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
     document.body.style.backgroundImage = `url(${background})`;
@@ -58,6 +61,7 @@ export default function App() {
 
       <div className="app-container">
         <Sidebar setCurrentPage={setCurrentPage} />
+        
 
         <main className="main-content">
           <TopBar />
@@ -85,6 +89,24 @@ export default function App() {
           {currentPage === "settings" && (
             <Settings setBackground={setBackground} />
           )}
+
+          {
+              currentPage === "admin" && (
+                  <AdminPanel
+                      setCurrentPage={setCurrentPage}
+                      setSelectedUser={setSelectedUser}
+                  />
+              )
+          }
+
+          {
+              currentPage === "editUser" && (
+                  <EditStudent
+                      user={selectedUser}
+                      setCurrentPage={setCurrentPage}
+                  />
+              )
+          }
 
 
         </main>
