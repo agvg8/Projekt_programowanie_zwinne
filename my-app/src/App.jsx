@@ -10,6 +10,8 @@ import Settings from "./pages/Settings";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ProjectDetails from "./pages/ProjectDetails";
+import AdminPanel from "./pages/AdminPanel";
+import EditStudent from "./pages/EditStudent";
 import { fetchProjects } from "./api/projektApi";
 
 export default function App() {
@@ -19,6 +21,7 @@ export default function App() {
   const [background, setBackground] = useState("/bg1.jpg");
   const [selectedTask, setSelectedTask] = useState(null);
   const [projects, setProjects] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
@@ -76,6 +79,7 @@ export default function App() {
       <div className="app-container">
         <Sidebar setCurrentPage={setCurrentPage} />
 
+
         <main className="main-content">
           <TopBar />
 
@@ -101,24 +105,24 @@ export default function App() {
                 }}
                 />
               <div className="pagination">
-                <button 
-                  onClick={() => setPage(p => Math.max(0, p - 1))} 
+                <button
+                  onClick={() => setPage(p => Math.max(0, p - 1))}
                   disabled={page === 0}
                 >
                   Poprzednia
                 </button>
                 <span>Strona {page + 1} z {totalPages}</span>
-                <button 
-                  onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))} 
+                <button
+                  onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
                   disabled={page >= totalPages - 1}
                 >
                   Następna
                 </button>
-                <select 
-                  value={size} 
-                  onChange={(e) => { 
-                    setSize(Number(e.target.value)); 
-                    setPage(0); 
+                <select
+                  value={size}
+                  onChange={(e) => {
+                    setSize(Number(e.target.value));
+                    setPage(0);
                   }}
                 >
                   <option value={5}>5 na stronę</option>
@@ -139,6 +143,24 @@ export default function App() {
           {currentPage === "settings" && (
             <Settings setBackground={setBackground} />
           )}
+
+          {
+              currentPage === "admin" && (
+                  <AdminPanel
+                      setCurrentPage={setCurrentPage}
+                      setSelectedUser={setSelectedUser}
+                  />
+              )
+          }
+
+          {
+              currentPage === "editUser" && (
+                  <EditStudent
+                      user={selectedUser}
+                      setCurrentPage={setCurrentPage}
+                  />
+              )
+          }
 
 
         </main>
