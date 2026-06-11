@@ -51,7 +51,7 @@ public class ProjektZalacznik {
     private String contentType;
 
     @Column(nullable = false)
-    private long size;
+    private Long size;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
