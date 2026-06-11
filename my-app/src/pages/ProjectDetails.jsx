@@ -20,18 +20,22 @@ export default function ProjectDetails({ project, onBack }) {
 
     // lokalny stan (po sync z backendem)
     const [tasks, setTasks] = useState([]);
+    const [page, setPage] = useState(0);
+    const [size, setSize] = useState(10);
+    const [totalPages, setTotalPages] = useState(1);
 
     useEffect(() => {
-        fetchProjectTasks(project.id).then((data) => {
-            setTasks(data.map(z => ({
+        fetchProjectTasks(project.id, page, size).then((data) => {
+            setTasks(data.tasks.map(z => ({
                 id: z.zadanieId,
                 text: z.nazwa,
                 opis: z.opis,
                 priority: z.priorytet,
                 uiPriority: mapPriority(z.priorytet),
             })));
+            setTotalPages(data.totalPages);
         });
-    }, [project.id]);
+    }, [project.id, page, size]);
 
     // progress (HIGH = done, bo na razie nie ma logiki done/undone)
     const progress = useMemo(() => {
@@ -153,6 +157,35 @@ export default function ProjectDetails({ project, onBack }) {
                         </div>
                     ))}
                 </div>
+
+                {totalPages > 0 && (
+                    <div className="pagination">
+                        <button 
+                            onClick={() => setPage(p => Math.max(0, p - 1))} 
+                            disabled={page === 0}
+                        >
+                            Poprzednia
+                        </button>
+                        <span>Strona {page + 1} z {totalPages}</span>
+                        <button 
+                            onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))} 
+                            disabled={page >= totalPages - 1}
+                        >
+                            Następna
+                        </button>
+                        <select 
+                            value={size} 
+                            onChange={(e) => { 
+                                setSize(Number(e.target.value)); 
+                                setPage(0); 
+                            }}
+                        >
+                            <option value={5}>5 na stronę</option>
+                            <option value={10}>10 na stronę</option>
+                            <option value={20}>20 na stronę</option>
+                        </select>
+                    </div>
+                )}
             </div>
 
         </div>
