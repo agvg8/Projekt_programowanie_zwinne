@@ -64,6 +64,10 @@ public class Projekt {
             inverseJoinColumns = {@JoinColumn(name = "uzytkownik_id")})
     private Set<Uzytkownik> uzytkownicy;
 
+    @OneToMany(mappedBy = "projekt", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @JsonIgnoreProperties({"projekt"})
+    private List<ProjektZalacznik> zalaczniki;
+
     public Projekt(String nazwa, String opis){
         this.nazwa = nazwa;
         this.opis = opis;

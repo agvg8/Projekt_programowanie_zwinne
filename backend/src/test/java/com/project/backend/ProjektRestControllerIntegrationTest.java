@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.project.backend.model.Projekt;
 import com.project.backend.service.ProjektService;
+import com.project.backend.service.ProjektZalacznikService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,6 +42,9 @@ public class ProjektRestControllerIntegrationTest {
 
     @MockBean
     private ProjektService mockProjektService;
+
+    @MockBean
+    private ProjektZalacznikService mockProjektZalacznikService;
 
     @Autowired
     private MockMvc mockMvc;
