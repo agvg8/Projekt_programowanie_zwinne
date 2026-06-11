@@ -14,7 +14,7 @@ public class ProjektZalacznikDto {
     private Integer zalacznikId;
     private String filename;
     private String contentType;
-    private long size;
+    private Long size;
     private LocalDateTime uploadedAt;
     private String downloadUrl;
 
