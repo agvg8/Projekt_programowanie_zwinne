@@ -551,3 +551,50 @@ body, html {
   font-weight: bold;
   opacity: 0.7;
 }
+
+/* PAGINATION */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.pagination button {
+  background: #989a35;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.pagination button:hover:not(:disabled) {
+  background: #7f812c;
+}
+
+.pagination button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.pagination span {
+  font-weight: 600;
+  color: var(--text-soft);
+}
+
+.pagination select {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: white;
+  cursor: pointer;
+  color: var(--text-main); /* Dodanie koloru tekstu */
+}
+
+/* Opcjonalnie upewnienie się, że opcje też mają poprawny kolor */
+.pagination select option {
+  color: #000;
+}

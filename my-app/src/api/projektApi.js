@@ -6,31 +6,38 @@ const authHeaders = () => ({
     Authorization: `Bearer ${keycloak.token}`
 });
 
-export async function fetchProjects() {
-    const res = await fetch(BASE_URL, {
+export async function fetchProjects(page = 0, size = 10) {
+    const res = await fetch(`${BASE_URL}?page=${page}&size=${size}`, {
         headers: authHeaders()
     });
     const data = await res.json();
     console.log(data)
-    return data.content.map((p) => ({
-        id: p.projektId,
-        nazwa: p.nazwa,
-        opis: p.opis,
-        data_oddania: p.data_oddania,
-        data_utworzenia: p.data_utworzenia,
-        zadania: p.zadania || []
-    }));
+    return {
+        projects: data.content.map((p) => ({
+            id: p.projektId,
+            nazwa: p.nazwa,
+            opis: p.opis,
+            data_oddania: p.data_oddania,
+            data_utworzenia: p.data_utworzenia,
+            zadania: p.zadania || []
+        })),
+        totalPages: data.totalPages
+    };
 }
 
-export async function fetchProjectTasks(projectId) {
+export async function fetchProjectTasks(projectId, page = 0, size = 10) {
     const res = await fetch(
-        `${BASE_URL}/${projectId}/zadania`,
+        `${BASE_URL}/${projectId}/zadania?page=${page}&size=${size}`,
         {
             headers: authHeaders()
         }
     );
 
-    return res.json();
+    const data = await res.json();
+    return {
+        tasks: data.content,
+        totalPages: data.totalPages
+    }
 }
 
 export async function fetchProjectAttachments(projectId) {

@@ -6,6 +6,7 @@ import com.project.backend.model.ProjektZalacznik;
 import com.project.backend.model.Zadanie;
 import com.project.backend.service.ProjektService;
 import com.project.backend.service.ProjektZalacznikService;
+import com.project.backend.service.ZadanieService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -30,6 +31,7 @@ import java.util.List;
 public class ProjektRestController {
     private final ProjektService projektService;
     private final ProjektZalacznikService projektZalacznikService;
+    private final ZadanieService zadanieService;
 
     @GetMapping("/{projektId}")
     public ResponseEntity<Projekt> getProjekt(@PathVariable("projektId") Integer projektId) {
@@ -75,8 +77,8 @@ public class ProjektRestController {
     }
 
     @GetMapping("/{projektId}/zadania")
-    public List<Zadanie> getZadaniaByProjekt(@PathVariable Integer projektId){
-        return projektService.getProjekt(projektId).getZadania();
+    public Page<Zadanie> getZadaniaByProjekt(@PathVariable Integer projektId, Pageable pageable){
+        return zadanieService.getZadaniaByProjekt(projektId, pageable);
     }
 
     @PostMapping(value = "/{projektId}/zalaczniki", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
