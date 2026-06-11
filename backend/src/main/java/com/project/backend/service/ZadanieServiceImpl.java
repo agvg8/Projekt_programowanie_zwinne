@@ -68,4 +68,14 @@ public class ZadanieServiceImpl implements ZadanieService {
     public Page<Zadanie> getZadaniaByProjekt(Integer projektId, Pageable pageable) {
         return zadanieRepository.findByProjekt_ProjektId(projektId, pageable);
     }
+
+    @Override
+    public Page<Zadanie> getZadaniaByProjektAndNazwa(Integer projektId, String nazwa, Pageable pageable) {
+        return zadanieRepository.findByProjekt_ProjektIdAndNazwaContainingIgnoreCase(projektId, nazwa, pageable);
+    }
+
+    @Override
+    public Page<Zadanie> searchByNazwa(String nazwa, Pageable pageable) {
+        return zadanieRepository.findByNazwaContainingIgnoreCase(nazwa, pageable);
+    }
 }

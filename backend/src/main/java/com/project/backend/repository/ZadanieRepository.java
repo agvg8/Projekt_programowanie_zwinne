@@ -21,4 +21,6 @@ public interface ZadanieRepository extends JpaRepository<Zadanie, Integer> {
 
     Page<Zadanie> findByStatus(Status status, Pageable pageable);
     Page<Zadanie> findByProjekt_ProjektId(Integer projektId, Pageable pageable);
+    Page<Zadanie> findByNazwaContainingIgnoreCase(String nazwa, Pageable pageable);
+    Page<Zadanie> findByProjekt_ProjektIdAndNazwaContainingIgnoreCase(Integer projektId, String nazwa, Pageable pageable);
 }

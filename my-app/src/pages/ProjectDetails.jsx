@@ -24,8 +24,19 @@ export default function ProjectDetails({ project, onBack }) {
     const [size, setSize] = useState(10);
     const [totalPages, setTotalPages] = useState(1);
 
+    const [search, setSearch] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
+
     useEffect(() => {
-        fetchProjectTasks(project.id, page, size).then((data) => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(search);
+            setPage(0);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [search]);
+
+    useEffect(() => {
+        fetchProjectTasks(project.id, page, size, debouncedSearch).then((data) => {
             setTasks(data.tasks.map(z => ({
                 id: z.zadanieId,
                 text: z.nazwa,
@@ -35,7 +46,7 @@ export default function ProjectDetails({ project, onBack }) {
             })));
             setTotalPages(data.totalPages);
         });
-    }, [project.id, page, size]);
+    }, [project.id, page, size, debouncedSearch]);
 
     // progress (HIGH = done, bo na razie nie ma logiki done/undone)
     const progress = useMemo(() => {
@@ -126,7 +137,18 @@ export default function ProjectDetails({ project, onBack }) {
 
             {/* TASK LIST */}
             <div className="subtasks-section">
-                <h2>Tasks</h2>
+                <div className="tasks-header">
+                    <h2>Tasks</h2>
+                    <div className="search-container">
+                        <input
+                            type="text"
+                            placeholder="Search tasks..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            className="search-input"
+                        />
+                    </div>
+                </div>
 
                 <div className="subtasks-list">
                     {tasks.map((task) => (

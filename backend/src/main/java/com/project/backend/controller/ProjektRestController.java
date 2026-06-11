@@ -77,7 +77,13 @@ public class ProjektRestController {
     }
 
     @GetMapping("/{projektId}/zadania")
-    public Page<Zadanie> getZadaniaByProjekt(@PathVariable Integer projektId, Pageable pageable){
+    public Page<Zadanie> getZadaniaByProjekt(
+            @PathVariable Integer projektId,
+            @RequestParam(name = "nazwa", required = false) String nazwa,
+            Pageable pageable){
+        if (nazwa != null && !nazwa.trim().isEmpty()) {
+            return zadanieService.getZadaniaByProjektAndNazwa(projektId, nazwa, pageable);
+        }
         return zadanieService.getZadaniaByProjekt(projektId, pageable);
     }
 

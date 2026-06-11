@@ -23,4 +23,8 @@ public interface ZadanieService {
     Page<Zadanie> getZadaniaByStatus(Status status, Pageable pageable);
 
     Page<Zadanie> getZadaniaByProjekt(Integer projektId, Pageable pageable);
+
+    Page<Zadanie> getZadaniaByProjektAndNazwa(Integer projektId, String nazwa, Pageable pageable);
+
+    Page<Zadanie> searchByNazwa(String nazwa, Pageable pageable);
 }

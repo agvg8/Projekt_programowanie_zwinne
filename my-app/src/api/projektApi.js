@@ -6,8 +6,9 @@ const authHeaders = () => ({
     Authorization: `Bearer ${keycloak.token}`
 });
 
-export async function fetchProjects(page = 0, size = 10) {
-    const res = await fetch(`${BASE_URL}?page=${page}&size=${size}`, {
+export async function fetchProjects(page = 0, size = 10, search = "") {
+    const query = search ? `&nazwa=${encodeURIComponent(search)}` : "";
+    const res = await fetch(`${BASE_URL}?page=${page}&size=${size}${query}`, {
         headers: authHeaders()
     });
     const data = await res.json();
@@ -25,9 +26,10 @@ export async function fetchProjects(page = 0, size = 10) {
     };
 }
 
-export async function fetchProjectTasks(projectId, page = 0, size = 10) {
+export async function fetchProjectTasks(projectId, page = 0, size = 10, search = "") {
+    const query = search ? `&nazwa=${encodeURIComponent(search)}` : "";
     const res = await fetch(
-        `${BASE_URL}/${projectId}/zadania?page=${page}&size=${size}`,
+        `${BASE_URL}/${projectId}/zadania?page=${page}&size=${size}${query}`,
         {
             headers: authHeaders()
         }
