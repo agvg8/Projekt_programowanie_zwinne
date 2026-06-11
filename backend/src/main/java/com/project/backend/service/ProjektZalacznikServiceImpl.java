@@ -22,7 +22,7 @@ public class ProjektZalacznikServiceImpl implements ProjektZalacznikService {
     private final ProjektZalacznikRepository projektZalacznikRepository;
     private final AttachmentStorageService storageService;
     private final Set<String> allowedTypes;
-    private final long maxSizeBytes;
+    private final Long maxSizeBytes;
 
     public ProjektZalacznikServiceImpl(
             ProjektService projektService,
