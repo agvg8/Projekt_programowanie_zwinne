@@ -24,7 +24,12 @@ public class ZadanieController {
     private final ProjektService projektService;
 
     @GetMapping()
-    public ResponseEntity<Page<Zadanie>> getZadania(Pageable pageable) {
+    public ResponseEntity<Page<Zadanie>> getZadania(
+            @RequestParam(name = "nazwa", required = false) String nazwa,
+            Pageable pageable) {
+        if (nazwa != null && !nazwa.trim().isEmpty()) {
+            return ResponseEntity.ok(zadanieService.searchByNazwa(nazwa, pageable));
+        }
         return ResponseEntity.ok(zadanieService.getZadania(pageable));
     }
 

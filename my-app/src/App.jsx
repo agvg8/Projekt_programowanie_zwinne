@@ -27,12 +27,23 @@ export default function App() {
     document.body.style.backgroundImage = `url(${background})`;
   }, [background]);
 
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
   useEffect(() => {
-    fetchProjects(page, size).then(data => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(0);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  useEffect(() => {
+    fetchProjects(page, size, debouncedSearch).then(data => {
       setProjects(data.projects);
       setTotalPages(data.totalPages);
     });
-  }, [page, size]);
+  }, [page, size, debouncedSearch]);
 
   const handleLogin = (username, password) => {
     if (username === "admin" && password === "admin") {
@@ -70,7 +81,18 @@ export default function App() {
 
           {currentPage === "dashboard" && (
             <>
-              <h1 className="title">My Projects</h1>
+              <div className="dashboard-header">
+                <h1 className="title">My Projects</h1>
+                <div className="search-container">
+                  <input
+                    type="text"
+                    placeholder="Search projects..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="search-input"
+                  />
+                </div>
+              </div>
               <TaskList
                 tasks={projects}
                 onTaskClick={(task) => {

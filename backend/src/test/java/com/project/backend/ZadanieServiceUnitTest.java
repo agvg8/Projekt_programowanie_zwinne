@@ -109,4 +109,30 @@ class ZadanieServiceUnitTest {
         assertEquals(1, result.getContent().size());
         verify(zadanieRepository).findAll(pageable);
     }
+
+    @Test
+    void searchByNazwa_shouldReturnPage() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Zadanie> page = new PageImpl<>(List.of(zadanie));
+
+        when(zadanieRepository.findByNazwaContainingIgnoreCase("Test", pageable)).thenReturn(page);
+
+        Page<Zadanie> result = zadanieService.searchByNazwa("Test", pageable);
+
+        assertEquals(1, result.getContent().size());
+        verify(zadanieRepository).findByNazwaContainingIgnoreCase("Test", pageable);
+    }
+
+    @Test
+    void getZadaniaByProjektAndNazwa_shouldReturnPage() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Zadanie> page = new PageImpl<>(List.of(zadanie));
+
+        when(zadanieRepository.findByProjekt_ProjektIdAndNazwaContainingIgnoreCase(1, "Test", pageable)).thenReturn(page);
+
+        Page<Zadanie> result = zadanieService.getZadaniaByProjektAndNazwa(1, "Test", pageable);
+
+        assertEquals(1, result.getContent().size());
+        verify(zadanieRepository).findByProjekt_ProjektIdAndNazwaContainingIgnoreCase(1, "Test", pageable);
+    }
 }
