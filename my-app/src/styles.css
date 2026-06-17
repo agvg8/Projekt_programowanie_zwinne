@@ -255,20 +255,6 @@ body, html {
   margin-bottom: 16px;
 }
 
-.back-btn {
-  background: #989a35;
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.back-btn:hover {
-  background: #7f812c;
-}
-
 /* TITLE */
 .details-title {
   font-family: "JetBrains Mono", monospace;
@@ -321,20 +307,6 @@ body, html {
 /* HEADER */
 .details-header {
   margin-bottom: 16px;
-}
-
-.back-btn {
-  background: #989a35;
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.back-btn:hover {
-  background: #7f812c;
 }
 
 /* TITLE */
@@ -470,17 +442,6 @@ body, html {
 .project-desc {
   color: #666;
   margin-bottom: 20px;
-}
-
-/* BACK BUTTON */
-.back-btn {
-  background: #989a35;
-  color: white;
-  border: none;
-  padding: 10px 14px;
-  border-radius: 10px;
-  cursor: pointer;
-  margin-bottom: 16px;
 }
 
 /* PROGRESS */
@@ -776,6 +737,13 @@ body, html {
   padding: 24px;
 }
 
+.admin-panel h1 {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  color: #1f1f1f;
+  margin-bottom: 20px;
+}
+
 .users-list {
   display: flex;
   flex-direction: column;
@@ -783,15 +751,24 @@ body, html {
 }
 
 .student-card {
-  background: white;
-  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(6px);
+
+  border-radius: 15px;
   padding: 20px;
 
   display: flex;
   justify-content: space-between;
   align-items: center;
 
-  box-shadow: 0 4px 12px rgba(0,0,0,.06);
+  box-shadow: 0 8px 20px rgba(0,0,0,.06);
+
+  transition: 0.2s;
+}
+
+.student-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(0,0,0,.1);
 }
 
 .student-actions {
@@ -821,6 +798,8 @@ body, html {
   font-size: 12px;
 }
 
+/*EDIT FORM START*/
+
 .edit-user-page {
   padding: 24px;
 }
@@ -835,13 +814,165 @@ body, html {
 
 .edit-form input,
 .edit-form select {
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid #ddd;
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 12px 14px;
+  border-radius: 12px;
+
+  border: 1px solid rgba(0,0,0,0.08);
+  background: rgba(255,255,255,0.75);
+
+  color: var(--text-main);
+
+  font-size: 14px;
+  font-family: var(--font-body);
+
+  outline: none;
+  transition: all 0.2s ease;
+
+  backdrop-filter: blur(6px);
+}
+
+.edit-form input:focus,
+.edit-form select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(152, 154, 53, 0.15);
+
+  transform: translateY(-1px);
+  background: rgba(255,255,255,0.9);
+}
+
+.edit-form label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+
+  color: var(--text-soft);
+
+  margin-top: 8px;
+  margin-bottom: 4px;
+
+  text-transform: uppercase;
+}
+
+.edit-form input:hover,
+.edit-form select:hover {
+  border-color: rgba(152, 154, 53, 0.4);
 }
 
 .edit-buttons {
   display: flex;
   gap: 12px;
   margin-top: 12px;
+}
+
+/*EDIT FORM END*/
+
+h1, h2, .title {
+  color: #1f1f1f;
+}
+
+/* BUTTONS SECTION START*/
+
+.back-btn,
+.save-btn {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 42px;
+  min-height: 42px;
+
+  padding: 0 14px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  /* 👇 klucz do “ładnego zielonego stylu” */
+  background: var(--primary);
+  color: white;
+}
+
+.btn-edit,
+.btn-delete {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 10px 14px;
+  border-radius: 10px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  border: none;
+}
+
+.save-btn {
+  background: linear-gradient(135deg, #989a35, #7f812c);
+  box-shadow: 0 6px 15px rgba(152, 154, 53, 0.25);
+}
+
+.back-btn {
+  background: #989a35;
+  opacity: 0.95;
+}
+
+.btn-edit:hover,
+.btn-delete:hover,
+.back-btn:hover,
+.save-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(152, 154, 53, 0.35);
+}
+
+.btn-edit:active,
+.btn-delete:active,
+.back-btn:active,
+.save-btn:active {
+  transform: translateY(0px) scale(0.98);
+  box-shadow: 0 4px 10px rgba(152, 154, 53, 0.2);
+}
+
+.back-btn,
+.save-btn {
+  letter-spacing: 0.3px;
+}
+
+.btn-edit {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 6px 15px rgba(152, 154, 53, 0.2);
+}
+
+.btn-delete {
+  background: #f5bbb9;
+  color: #7a1f1f;
+  box-shadow: 0 6px 15px rgba(245, 187, 185, 0.25);
+}
+
+/* BUTTONS SECTION END*/
+
+:root {
+  --primary: #989a35;
+  --accent: #f5bbb9;
+  --bg-soft: #f7f0e6;
+}
+
+.edit-user-page h1 {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  color: #1f1f1f;
+  margin-bottom: 20px;
 }
