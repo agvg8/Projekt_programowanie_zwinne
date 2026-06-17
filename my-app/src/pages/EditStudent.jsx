@@ -67,17 +67,15 @@ export default function EditStudent({
                 <div className="edit-buttons">
 
                     <button
-                        className="save-btn"
+                        className="btn save-btn"
                         onClick={saveChanges}
                     >
                         Save Changes
                     </button>
 
                     <button
-                        className="back-btn"
-                        onClick={() =>
-                            setCurrentPage("admin")
-                        }
+                        className="btn back-btn"
+                        onClick={() => setCurrentPage("admin")}
                     >
                         Back
                     </button>
