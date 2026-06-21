@@ -1,6 +1,7 @@
 package com.project.backend.controller;
 
 import com.project.backend.dto.ProjektZalacznikDto;
+import com.project.backend.dto.ProjektDto;
 import com.project.backend.model.Projekt;
 import com.project.backend.model.ProjektZalacznik;
 import com.project.backend.model.Zadanie;
@@ -80,7 +81,7 @@ public class ProjektRestController {
     public Page<Zadanie> getZadaniaByProjekt(
             @PathVariable Integer projektId,
             @RequestParam(name = "nazwa", required = false) String nazwa,
-            Pageable pageable){
+            Pageable pageable) {
         if (nazwa != null && !nazwa.trim().isEmpty()) {
             return zadanieService.getZadaniaByProjektAndNazwa(projektId, nazwa, pageable);
         }
@@ -124,5 +125,11 @@ public class ProjektRestController {
                 .contentType(MediaType.parseMediaType(attachment.contentType()))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + attachment.filename() + "\"")
                 .body(attachment.resource());
+    }
+
+    @PatchMapping("/update")
+    public ResponseEntity<Void> updateProjekt(@Valid @RequestBody ProjektDto projekt) {
+        projektService.updateProjekt(projekt);
+        return ResponseEntity.ok().build();
     }
 }
