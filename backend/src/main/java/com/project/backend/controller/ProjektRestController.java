@@ -1,6 +1,7 @@
 package com.project.backend.controller;
 
 import com.project.backend.dto.ProjektZalacznikDto;
+import com.project.backend.dto.ProjektDto;
 import com.project.backend.model.Projekt;
 import com.project.backend.model.ProjektZalacznik;
 import com.project.backend.model.Zadanie;
@@ -80,7 +81,7 @@ public class ProjektRestController {
     public Page<Zadanie> getZadaniaByProjekt(
             @PathVariable Integer projektId,
             @RequestParam(name = "nazwa", required = false) String nazwa,
-            Pageable pageable){
+            Pageable pageable) {
         if (nazwa != null && !nazwa.trim().isEmpty()) {
             return zadanieService.getZadaniaByProjektAndNazwa(projektId, nazwa, pageable);
         }
@@ -134,9 +135,13 @@ public class ProjektRestController {
     }
 
     @PatchMapping("/{projektId}/usun/uzytkownik/{uzytkownikId}")
-    public ResponseEntity<Void> usunUzytkownika(@PathVariable Integer projektId, @PathVariable Integer uzytkownikId)
-    {
+    public ResponseEntity<Void> usunUzytkownika(@PathVariable Integer projektId, @PathVariable Integer uzytkownikId) {
         projektService.usunPrzypisanieUzytkownika(projektId, uzytkownikId);
+        return ResponseEntity.ok().build();
+    }
+    @PatchMapping("/update")
+    public ResponseEntity<Void> updateProjekt(@Valid @RequestBody ProjektDto projekt) {
+        projektService.updateProjekt(projekt);
         return ResponseEntity.ok().build();
     }
 }

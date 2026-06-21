@@ -1,8 +1,13 @@
 package com.project.backend.service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
+<<<<<<< HEAD
 import com.project.backend.model.Uzytkownik;
+=======
+import com.project.backend.dto.ProjektDto;
+>>>>>>> f4edcce (rozwiązanie konfliktów)
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -54,6 +59,7 @@ public class ProjektServiceImpl implements ProjektService {
     }
 
     @Override
+<<<<<<< HEAD
     @Transactional
     public void przypiszUzytkownika(Integer projektId, Integer uzytkownikId) {
         Projekt projekt = getProjekt(projektId);
@@ -68,5 +74,15 @@ public class ProjektServiceImpl implements ProjektService {
         Projekt projekt = getProjekt(projektId);
         projekt.getUzytkownicy().removeIf(u -> u.getUzytkownikId().equals(uzytkownikId));
         setProjekt(projekt);
+=======
+    public Projekt updateProjekt(ProjektDto dto) {
+        Projekt projekt = getProjekt(dto.getProjektId());
+        projekt.setNazwa(dto.getNazwa());
+        projekt.setOpis(dto.getOpis());
+        projekt.setData_oddania(dto.getDataOddania());
+        projekt.setLastModifiedDate(LocalDateTime.now());
+        projekt = setProjekt(projekt);
+        return projekt;
+>>>>>>> f4edcce (rozwiązanie konfliktów)
     }
 }

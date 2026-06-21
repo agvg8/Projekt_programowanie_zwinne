@@ -1,5 +1,6 @@
 package com.project.backend.controller;
 
+import com.project.backend.dto.ZadanieDto;
 import com.project.backend.model.Priorytet;
 import com.project.backend.model.Status;
 import com.project.backend.model.Zadanie;
@@ -92,7 +93,6 @@ public class ZadanieController {
         }
     }
 
-
     @PatchMapping("/{zadanieId}/przypisz/zadanie/{projektId}")
     public ResponseEntity<Void> przypiszZadanie(@PathVariable Integer zadanieId, @PathVariable Integer projektId)
     {
@@ -109,5 +109,10 @@ public class ZadanieController {
         } catch (ValidationException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
+    }
+    @PatchMapping("/update")
+    public ResponseEntity<Void> updateZadanie(@Valid @RequestBody ZadanieDto zadanie) {
+        zadanieService.updateZadanie(zadanie);
+        return ResponseEntity.ok().build();
     }
 }

@@ -1,5 +1,6 @@
 package com.project.backend.service;
 
+import com.project.backend.dto.ZadanieDto;
 import com.project.backend.model.Status;
 import com.project.backend.model.Zadanie;
 import jakarta.validation.ValidationException;
@@ -32,4 +33,6 @@ public interface ZadanieService {
     void przypiszZadanie(Integer zadanieId, Integer projektId);
 
     void usunPrzypisanieZadania(Integer zadanieId, Integer projektId) throws ValidationException;
+
+    Zadanie updateZadanie(ZadanieDto dto);
 }

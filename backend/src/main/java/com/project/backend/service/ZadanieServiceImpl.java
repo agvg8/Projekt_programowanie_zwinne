@@ -2,6 +2,7 @@ package com.project.backend.service;
 
 import java.util.Optional;
 
+import com.project.backend.dto.ZadanieDto;
 import com.project.backend.model.Priorytet;
 import com.project.backend.model.Status;
 import com.project.backend.repository.ZadanieRepository;
@@ -99,5 +100,18 @@ public class ZadanieServiceImpl implements ZadanieService {
         }
         zadanie.setProjekt(null);
         zadanieRepository.save(zadanie);
+    }
+
+    @Override
+    public Zadanie updateZadanie(ZadanieDto dto) {
+        Zadanie zadanie = getZadanie(dto.getZadanieId());
+        zadanie.setNazwa(dto.getNazwa());
+        zadanie.setOpis(dto.getOpis());
+        zadanie.setKolejnosc(dto.getKolejnosc());
+        zadanie.setDataczasDodania(dto.getDataOddania());
+        zadanie.setPriorytet(dto.getPriorytet());
+        zadanie.setStatus(dto.getStatus());
+        zadanie = setZadanie(zadanie);
+        return zadanie;
     }
 }
