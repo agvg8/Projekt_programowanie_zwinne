@@ -1,5 +1,6 @@
 package com.project.backend.config;
 
+import jakarta.ws.rs.HttpMethod;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -23,8 +24,44 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        // rejestracja - ALL (no auth)
                         .requestMatchers("/auth/register").permitAll()
-                        .requestMatchers("/**").hasAnyRole("USER", "MANAGER", "ADMIN")
+
+                        // przypisywanie użytkownika do projektu
+                        .requestMatchers(HttpMethod.PATCH,
+                                "/api/projekt/*/przypisz/uzytkownik/*",
+                                "/api/projekt/*/usun/uzytkownik/*")
+                        .hasAnyRole("USER", "MANAGER", "ADMIN")
+
+                        // odczyt projektów i zadań - USER, MANAGER, ADMIN
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/projekt/**",
+                                "/api/zadanie/**")
+                        .hasAnyRole("USER", "MANAGER", "ADMIN")
+
+                        // modyfikacja projektów i zadań - MANAGER, ADMIN
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/projekt/**",
+                                "/api/zadanie/**")
+                        .hasAnyRole("MANAGER", "ADMIN")
+
+                        .requestMatchers(HttpMethod.PUT,
+                                "/api/projekt/**",
+                                "/api/zadanie/**")
+                        .hasAnyRole("MANAGER", "ADMIN")
+
+                        .requestMatchers(HttpMethod.PATCH,
+                                "/api/projekt/**",
+                                "/api/zadanie/**")
+                        .hasAnyRole("MANAGER", "ADMIN")
+
+                        .requestMatchers(HttpMethod.DELETE,
+                                "/api/projekt/**",
+                                "/api/zadanie/**")
+                        .hasAnyRole("MANAGER", "ADMIN")
+
+                        // modyfikacja pól użytkowników
+                        .requestMatchers("/api/uzytkownik/**").hasAnyRole("ADMIN")
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth ->
                         oauth.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
