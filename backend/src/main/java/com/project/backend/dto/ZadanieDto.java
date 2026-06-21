@@ -24,8 +24,4 @@ public class ZadanieDto {
     @NotNull
     private Integer kolejnosc;
     private LocalDateTime dataOddania;
-    @NotNull
-    private Priorytet priorytet;
-    @NotNull
-    private Status status;
 }
