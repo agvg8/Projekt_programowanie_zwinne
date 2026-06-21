@@ -125,4 +125,18 @@ public class ProjektRestController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + attachment.filename() + "\"")
                 .body(attachment.resource());
     }
+
+    @PatchMapping("/{projektId}/przypisz/uzytkownik/{uzytkownikId}")
+    public ResponseEntity<Void> przypiszUzytkownika(@PathVariable Integer projektId, @PathVariable Integer uzytkownikId)
+    {
+        projektService.przypisUzytkownika(projektId, uzytkownikId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{projektId}/usun/uzytkownik/{uzytkownikId}")
+    public ResponseEntity<Void> usunUzytkownika(@PathVariable Integer projektId, @PathVariable Integer uzytkownikId)
+    {
+        projektService.usunPrzypisanieUzytkownika(projektId, uzytkownikId);
+        return ResponseEntity.ok().build();
+    }
 }

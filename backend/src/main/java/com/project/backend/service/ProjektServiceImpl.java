@@ -2,6 +2,7 @@ package com.project.backend.service;
 
 import java.util.Optional;
 
+import com.project.backend.model.Uzytkownik;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +17,7 @@ import com.project.backend.repository.ZadanieRepository;
 public class ProjektServiceImpl implements ProjektService {
     private final ProjektRepository projektRepository;
     private final ZadanieRepository zadanieRepository;
+    private final UzytkownikServiceImpl uzytkownikService;
 
     @Override
     public Optional<Projekt> getProjektOptional(Integer projektId) {
@@ -49,5 +51,22 @@ public class ProjektServiceImpl implements ProjektService {
     @Override
     public Page<Projekt> searchByNazwa(String nazwa, Pageable pageable) {
         return projektRepository.findByNazwaContainingIgnoreCase(nazwa, pageable);
+    }
+
+    @Override
+    @Transactional
+    public void przypisUzytkownika(Integer projektId, Integer uzytkownikId) {
+        Projekt projekt = getProjekt(projektId);
+        Uzytkownik uzytkownik = uzytkownikService.getUzytkownik(uzytkownikId);
+        projekt.getUzytkownicy().add(uzytkownik);
+        setProjekt(projekt);
+    }
+
+    @Override
+    @Transactional
+    public void usunPrzypisanieUzytkownika(Integer projektId, Integer uzytkownikId) {
+        Projekt projekt = getProjekt(projektId);
+        projekt.getUzytkownicy().removeIf(u -> u.getUzytkownikId().equals(uzytkownikId));
+        setProjekt(projekt);
     }
 }

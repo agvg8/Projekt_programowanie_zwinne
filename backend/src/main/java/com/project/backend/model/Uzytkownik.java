@@ -15,11 +15,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @Table(name = "uzytkownik",
-        indexes = { @Index(name = "idx_nazwisko", columnList = "nazwisko", unique = false) })
+        indexes = {@Index(name = "idx_nazwisko", columnList = "nazwisko", unique = false)})
 @NoArgsConstructor
 @Getter
 @Setter
@@ -60,5 +61,20 @@ public class Uzytkownik {
         this.imie = imie;
         this.nazwisko = nazwisko;
         this.rola = rola;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (!(o instanceof Uzytkownik other))
+            return false;
+
+        return Objects.equals(uzytkownikId, other.uzytkownikId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uzytkownikId);
     }
 }
