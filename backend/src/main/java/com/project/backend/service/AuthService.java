@@ -91,8 +91,8 @@ public class AuthService {
         uzytkownikService.setUzytkownik(uzytkownik);
     }
 
+    @Transactional
     public void updateUser(UzytkownikDto dto) {
-
         UsersResource usersResource = keycloak.realm(realm).users();
         Uzytkownik dbUser = uzytkownikService.getUzytkownik(dto.getId());
         List<UserRepresentation> users = usersResource.searchByEmail(dbUser.getEmail(), true);
@@ -113,5 +113,18 @@ public class AuthService {
         dbUser.setImie(dto.getImie());
         dbUser.setNazwisko(dto.getNazwisko());
         dbUser.setRola(dto.getRola());
+    }
+
+    @Transactional
+    public void deleteUser(Integer userId) {
+        Uzytkownik uzytkownik = uzytkownikService.getUzytkownik(userId);
+        UsersResource usersResource = keycloak.realm(realm).users();
+        List<UserRepresentation> users = usersResource.searchByEmail(uzytkownik.getEmail(), true);
+        if (users.isEmpty()) {
+            throw new RuntimeException("User not found in Keycloak");
+        }
+        UserRepresentation user = users.get(0);
+        usersResource.get(user.getId()).remove();
+        uzytkownikService.deleteUzytkownik(uzytkownik);
     }
 }
