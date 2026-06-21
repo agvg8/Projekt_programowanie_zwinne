@@ -5,10 +5,7 @@ import com.project.backend.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,6 +16,12 @@ public class UzytkownikController {
     @PatchMapping("/update")
     public ResponseEntity<Void> updateUzytkownik(@Valid @RequestBody UzytkownikDto dto) {
         authService.updateUser(dto);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Integer userId) {
+        authService.deleteUser(userId);
         return ResponseEntity.ok().build();
     }
 }
