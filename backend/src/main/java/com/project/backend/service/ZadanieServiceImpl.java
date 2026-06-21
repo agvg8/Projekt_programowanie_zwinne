@@ -109,8 +109,6 @@ public class ZadanieServiceImpl implements ZadanieService {
         zadanie.setOpis(dto.getOpis());
         zadanie.setKolejnosc(dto.getKolejnosc());
         zadanie.setDataczasDodania(dto.getDataOddania());
-        zadanie.setPriorytet(dto.getPriorytet());
-        zadanie.setStatus(dto.getStatus());
         zadanie = setZadanie(zadanie);
         return zadanie;
     }
