@@ -6,6 +6,7 @@ import com.project.backend.model.Zadanie;
 import com.project.backend.service.ZadanieServiceImpl;
 import com.project.backend.service.ProjektService;
 import jakarta.validation.Valid;
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -88,6 +89,25 @@ public class ZadanieController {
             return ResponseEntity.ok().build();
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+
+    @PatchMapping("/{zadanieId}/przypisz/zadanie/{projektId}")
+    public ResponseEntity<Void> przypiszZadanie(@PathVariable Integer zadanieId, @PathVariable Integer projektId)
+    {
+        zadanieService.przypiszZadanie(zadanieId, projektId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{zadanieId}/usun/zadanie/{projektId}")
+    public ResponseEntity<String> usunPrzypisanieZadania(@PathVariable Integer zadanieId, @PathVariable Integer projektId)
+    {
+        try {
+            zadanieService.przypiszZadanie(zadanieId, projektId);
+            return ResponseEntity.ok().build();
+        } catch (ValidationException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
     }
 }
