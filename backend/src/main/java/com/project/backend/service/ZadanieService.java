@@ -1,5 +1,6 @@
 package com.project.backend.service;
 
+import com.project.backend.dto.ZadanieDto;
 import com.project.backend.model.Status;
 import com.project.backend.model.Zadanie;
 import org.springframework.data.domain.Page;
@@ -27,4 +28,6 @@ public interface ZadanieService {
     Page<Zadanie> getZadaniaByProjektAndNazwa(Integer projektId, String nazwa, Pageable pageable);
 
     Page<Zadanie> searchByNazwa(String nazwa, Pageable pageable);
+
+    Zadanie updateZadanie(ZadanieDto dto);
 }

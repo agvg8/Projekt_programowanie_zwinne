@@ -1,6 +1,7 @@
 package com.project.backend.service;
 
 import com.project.backend.dto.RegisterRequest;
+import com.project.backend.dto.UzytkownikDto;
 import com.project.backend.model.RolaUzytkownika;
 import com.project.backend.model.Uzytkownik;
 
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 
+import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -87,5 +89,42 @@ public class AuthService {
         uzytkownik.setEmail(request.getEmail());
         uzytkownik.setRola(RolaUzytkownika.USER);
         uzytkownikService.setUzytkownik(uzytkownik);
+    }
+
+    @Transactional
+    public void updateUser(UzytkownikDto dto) {
+        UsersResource usersResource = keycloak.realm(realm).users();
+        Uzytkownik dbUser = uzytkownikService.getUzytkownik(dto.getId());
+        List<UserRepresentation> users = usersResource.searchByEmail(dbUser.getEmail(), true);
+
+        if (users.isEmpty()) {
+            throw new RuntimeException("User not found in Keycloak");
+        }
+
+        UserRepresentation user = users.get(0);
+
+        user.setEmail(dto.getEmail());
+        user.setUsername(dto.getImie() + "_" + dto.getNazwisko());
+        user.setFirstName(dto.getImie());
+        user.setLastName(dto.getNazwisko());
+        usersResource.get(user.getId()).update(user);
+
+        dbUser.setEmail(dto.getEmail());
+        dbUser.setImie(dto.getImie());
+        dbUser.setNazwisko(dto.getNazwisko());
+        dbUser.setRola(dto.getRola());
+    }
+
+    @Transactional
+    public void deleteUser(Integer userId) {
+        Uzytkownik uzytkownik = uzytkownikService.getUzytkownik(userId);
+        UsersResource usersResource = keycloak.realm(realm).users();
+        List<UserRepresentation> users = usersResource.searchByEmail(uzytkownik.getEmail(), true);
+        if (users.isEmpty()) {
+            throw new RuntimeException("User not found in Keycloak");
+        }
+        UserRepresentation user = users.get(0);
+        usersResource.get(user.getId()).remove();
+        uzytkownikService.deleteUzytkownik(uzytkownik);
     }
 }

@@ -1,7 +1,9 @@
 package com.project.backend.service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
+import com.project.backend.dto.ProjektDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -49,5 +51,16 @@ public class ProjektServiceImpl implements ProjektService {
     @Override
     public Page<Projekt> searchByNazwa(String nazwa, Pageable pageable) {
         return projektRepository.findByNazwaContainingIgnoreCase(nazwa, pageable);
+    }
+
+    @Override
+    public Projekt updateProjekt(ProjektDto dto) {
+        Projekt projekt = getProjekt(dto.getProjektId());
+        projekt.setNazwa(dto.getNazwa());
+        projekt.setOpis(dto.getOpis());
+        projekt.setData_oddania(dto.getDataOddania());
+        projekt.setLastModifiedDate(LocalDateTime.now());
+        projekt = setProjekt(projekt);
+        return projekt;
     }
 }

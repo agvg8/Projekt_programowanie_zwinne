@@ -1,6 +1,8 @@
 package com.project.backend.service;
 
 import java.util.Optional;
+
+import com.project.backend.dto.ProjektDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import com.project.backend.model.Projekt;
@@ -12,4 +14,5 @@ public interface ProjektService {
     void deleteProjekt(Integer projektId);
     Page<Projekt> getProjekty(Pageable pageable);
     Page<Projekt> searchByNazwa(String nazwa, Pageable pageable);
+    Projekt updateProjekt(ProjektDto dto);
 }

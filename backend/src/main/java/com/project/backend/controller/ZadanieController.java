@@ -1,5 +1,6 @@
 package com.project.backend.controller;
 
+import com.project.backend.dto.ZadanieDto;
 import com.project.backend.model.Priorytet;
 import com.project.backend.model.Status;
 import com.project.backend.model.Zadanie;
@@ -89,5 +90,11 @@ public class ZadanieController {
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @PatchMapping("/update")
+    public ResponseEntity<Void> updateZadanie(@Valid @RequestBody ZadanieDto zadanie) {
+        zadanieService.updateZadanie(zadanie);
+        return ResponseEntity.ok().build();
     }
 }
