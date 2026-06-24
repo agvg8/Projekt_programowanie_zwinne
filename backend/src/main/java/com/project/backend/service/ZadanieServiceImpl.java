@@ -4,7 +4,6 @@ import java.util.Optional;
 
 import com.project.backend.dto.ZadanieDto;
 import com.project.backend.model.Priorytet;
-import com.project.backend.model.Projekt;
 import com.project.backend.model.Status;
 import com.project.backend.repository.ZadanieRepository;
 import jakarta.validation.ValidationException;

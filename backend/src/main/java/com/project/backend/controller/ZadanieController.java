@@ -127,7 +127,7 @@ public class ZadanieController {
     public ResponseEntity<String> usunPrzypisanieZadania(@PathVariable Integer zadanieId, @PathVariable Integer projektId)
     {
         try {
-            zadanieService.przypiszZadanie(zadanieId, projektId);
+            zadanieService.usunPrzypisanieZadania(zadanieId, projektId);
             return ResponseEntity.ok().build();
         } catch (ValidationException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
