@@ -17,7 +17,7 @@ import com.project.backend.repository.ZadanieRepository;
 public class ProjektServiceImpl implements ProjektService {
     private final ProjektRepository projektRepository;
     private final ZadanieRepository zadanieRepository;
-    private final UzytkownikServiceImpl uzytkownikService;
+    private final UzytkownikService uzytkownikService;
 
     @Override
     public Optional<Projekt> getProjektOptional(Integer projektId) {
@@ -55,7 +55,7 @@ public class ProjektServiceImpl implements ProjektService {
 
     @Override
     @Transactional
-    public void przypisUzytkownika(Integer projektId, Integer uzytkownikId) {
+    public void przypiszUzytkownika(Integer projektId, Integer uzytkownikId) {
         Projekt projekt = getProjekt(projektId);
         Uzytkownik uzytkownik = uzytkownikService.getUzytkownik(uzytkownikId);
         projekt.getUzytkownicy().add(uzytkownik);

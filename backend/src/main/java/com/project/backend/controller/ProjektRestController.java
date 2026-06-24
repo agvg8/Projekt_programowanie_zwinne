@@ -129,7 +129,7 @@ public class ProjektRestController {
     @PatchMapping("/{projektId}/przypisz/uzytkownik/{uzytkownikId}")
     public ResponseEntity<Void> przypiszUzytkownika(@PathVariable Integer projektId, @PathVariable Integer uzytkownikId)
     {
-        projektService.przypisUzytkownika(projektId, uzytkownikId);
+        projektService.przypiszUzytkownika(projektId, uzytkownikId);
         return ResponseEntity.ok().build();
     }
 

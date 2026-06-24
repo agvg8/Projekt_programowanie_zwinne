@@ -3,10 +3,9 @@ package com.project.backend.service;
 import java.util.Optional;
 
 import com.project.backend.model.Priorytet;
-import com.project.backend.model.Projekt;
 import com.project.backend.model.Status;
 import com.project.backend.repository.ZadanieRepository;
-import jakarta.xml.bind.ValidationException;
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

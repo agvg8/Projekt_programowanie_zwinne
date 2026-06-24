@@ -2,7 +2,7 @@ package com.project.backend.service;
 
 import com.project.backend.model.Status;
 import com.project.backend.model.Zadanie;
-import jakarta.xml.bind.ValidationException;
+import jakarta.validation.ValidationException;
 import org.springframework.data.domain.Page;
 
 import java.util.Optional;
