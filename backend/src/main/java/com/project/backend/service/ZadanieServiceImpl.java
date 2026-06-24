@@ -112,22 +112,4 @@ public class ZadanieServiceImpl implements ZadanieService {
         zadanie = setZadanie(zadanie);
         return zadanie;
     }
-
-    @Transactional
-    public void przypiszZadanie(Integer zadanieId, Integer projektId) {
-        Zadanie zadanie = getZadanie(zadanieId);
-        zadanie.setProjekt(projektService.getProjekt(projektId));
-        setZadanie(zadanie);
-    }
-
-    @Override
-    @Transactional
-    public void usunPrzypisanieZadania(Integer zadanieId, Integer projektId) throws ValidationException {
-        Zadanie zadanie = getZadanie(zadanieId);
-        if (zadanie.getProjekt() == null || !zadanie.getProjekt().getProjektId().equals(projektId)) {
-            throw new ValidationException("Zadanie nie jest przypisane do tego projektu");
-        }
-        zadanie.setProjekt(null);
-        zadanieRepository.save(zadanie);
-    }
 }

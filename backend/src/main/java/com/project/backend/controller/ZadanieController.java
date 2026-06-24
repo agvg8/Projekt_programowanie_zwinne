@@ -110,27 +110,11 @@ public class ZadanieController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
     }
+
     @PatchMapping("/update")
     public ResponseEntity<Void> updateZadanie(@Valid @RequestBody ZadanieDto zadanie) {
         zadanieService.updateZadanie(zadanie);
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/{zadanieId}/przypisz/zadanie/{projektId}")
-    public ResponseEntity<Void> przypiszZadanie(@PathVariable Integer zadanieId, @PathVariable Integer projektId)
-    {
-        zadanieService.przypiszZadanie(zadanieId, projektId);
-        return ResponseEntity.ok().build();
-    }
-
-    @PatchMapping("/{zadanieId}/usun/zadanie/{projektId}")
-    public ResponseEntity<String> usunPrzypisanieZadania(@PathVariable Integer zadanieId, @PathVariable Integer projektId)
-    {
-        try {
-            zadanieService.usunPrzypisanieZadania(zadanieId, projektId);
-            return ResponseEntity.ok().build();
-        } catch (ValidationException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
-    }
 }

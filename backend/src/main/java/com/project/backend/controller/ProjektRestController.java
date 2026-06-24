@@ -139,23 +139,10 @@ public class ProjektRestController {
         projektService.usunPrzypisanieUzytkownika(projektId, uzytkownikId);
         return ResponseEntity.ok().build();
     }
+
     @PatchMapping("/update")
     public ResponseEntity<Void> updateProjekt(@Valid @RequestBody ProjektDto projekt) {
         projektService.updateProjekt(projekt);
-        return ResponseEntity.ok().build();
-    }
-
-    @PatchMapping("/{projektId}/przypisz/uzytkownik/{uzytkownikId}")
-    public ResponseEntity<Void> przypiszUzytkownika(@PathVariable Integer projektId, @PathVariable Integer uzytkownikId)
-    {
-        projektService.przypiszUzytkownika(projektId, uzytkownikId);
-        return ResponseEntity.ok().build();
-    }
-
-    @PatchMapping("/{projektId}/usun/uzytkownik/{uzytkownikId}")
-    public ResponseEntity<Void> usunUzytkownika(@PathVariable Integer projektId, @PathVariable Integer uzytkownikId)
-    {
-        projektService.usunPrzypisanieUzytkownika(projektId, uzytkownikId);
         return ResponseEntity.ok().build();
     }
 }
