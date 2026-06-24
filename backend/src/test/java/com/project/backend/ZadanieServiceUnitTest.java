@@ -1,8 +1,11 @@
 package com.project.backend;
 
+import com.project.backend.model.Projekt;
 import com.project.backend.model.Zadanie;
 import com.project.backend.repository.ZadanieRepository;
+import com.project.backend.service.ProjektService;
 import com.project.backend.service.ZadanieServiceImpl;
+import jakarta.validation.ValidationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,6 +24,9 @@ class ZadanieServiceUnitTest {
 
     @Mock
     private ZadanieRepository zadanieRepository;
+
+    @Mock
+    private ProjektService projektService;
 
     @InjectMocks
     private ZadanieServiceImpl zadanieService;
@@ -134,5 +140,115 @@ class ZadanieServiceUnitTest {
 
         assertEquals(1, result.getContent().size());
         verify(zadanieRepository).findByProjekt_ProjektIdAndNazwaContainingIgnoreCase(1, "Test", pageable);
+    }
+
+    @Test
+    void powinienPrzypisacZadanieDoProjektu() {
+        // given
+        Integer zadanieId = 1;
+        Integer projektId = 2;
+
+        Zadanie zadanie = new Zadanie();
+        zadanie.setZadanieId(zadanieId);
+
+        Projekt projekt = new Projekt();
+        projekt.setProjektId(projektId);
+
+        when(zadanieRepository.findById(zadanieId)).thenReturn(Optional.of(zadanie));
+
+        when(projektService.getProjekt(projektId)).thenReturn(projekt);
+
+        when(zadanieRepository.save(zadanie)).thenReturn(zadanie);
+
+        // when
+        zadanieService.przypiszZadanie(zadanieId, projektId);
+
+        // then
+        assertNotNull(zadanie.getProjekt());
+        assertEquals(projektId, zadanie.getProjekt().getProjektId());
+        verify(projektService).getProjekt(projektId);
+        verify(zadanieRepository).save(zadanie);
+    }
+
+    @Test
+    void powinienUsunacPrzypisanieZadaniaZProjektu() throws ValidationException {
+        // given
+        Integer zadanieId = 1;
+        Integer projektId = 2;
+
+        Projekt projekt = new Projekt();
+        projekt.setProjektId(projektId);
+
+        Zadanie zadanie = new Zadanie();
+        zadanie.setZadanieId(zadanieId);
+        zadanie.setProjekt(projekt);
+
+        when(zadanieRepository.findById(zadanieId)).thenReturn(Optional.of(zadanie));
+
+        // when
+        zadanieService.usunPrzypisanieZadania(zadanieId, projektId);
+
+        // then
+        assertNull(zadanie.getProjekt());
+
+        verify(zadanieRepository).save(zadanie);
+    }
+
+    @Test
+    void powinienRzucicWyjatekGdyZadanieNieJestPrzypisaneDoProjektu()
+            throws ValidationException {
+
+        // given
+        Integer zadanieId = 1;
+        Integer projektId = 2;
+
+        Zadanie zadanie = new Zadanie();
+        zadanie.setZadanieId(zadanieId);
+        zadanie.setProjekt(null);
+
+        when(zadanieRepository.findById(zadanieId)).thenReturn(Optional.of(zadanie));
+
+        // when + then
+        ValidationException exception = assertThrows(
+                ValidationException.class,
+                () -> zadanieService.usunPrzypisanieZadania(zadanieId, projektId)
+        );
+
+        assertEquals(
+                "Zadanie nie jest przypisane do tego projektu",
+                exception.getMessage()
+        );
+
+        verify(zadanieRepository, never()).save(any());
+    }
+
+    @Test
+    void powinienRzucicWyjatekGdyZadanieJestPrzypisaneDoInnegoProjektu()
+            throws ValidationException {
+
+        // given
+        Integer zadanieId = 1;
+        Integer obecnyProjektId = 5;
+        Integer wymaganyProjektId = 2;
+
+        Projekt projekt = new Projekt();
+        projekt.setProjektId(obecnyProjektId);
+
+        Zadanie zadanie = new Zadanie();
+        zadanie.setZadanieId(zadanieId);
+        zadanie.setProjekt(projekt);
+
+        when(zadanieRepository.findById(zadanieId))
+                .thenReturn(Optional.of(zadanie));
+
+        // when + then
+        ValidationException exception = assertThrows(
+                ValidationException.class,
+                () -> zadanieService.usunPrzypisanieZadania(zadanieId, wymaganyProjektId)
+        );
+
+        assertEquals("Zadanie nie jest przypisane do tego projektu", exception.getMessage());
+
+        verify(zadanieRepository, never()).save(any());
     }
 }
