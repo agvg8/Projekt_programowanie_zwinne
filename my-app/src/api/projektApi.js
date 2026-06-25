@@ -82,3 +82,19 @@ export async function downloadProjectAttachment(projectId, attachmentId) {
 
     return { blob, filename };
 }
+
+export async function updateProject(projectDto) {
+    const res = await fetch(`${BASE_URL}/update`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+            ...authHeaders()
+        },
+        body: JSON.stringify(projectDto)
+    });
+
+    if (!res.ok) {
+        throw new Error("Update failed");
+    }
+}
+
