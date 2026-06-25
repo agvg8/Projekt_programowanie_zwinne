@@ -1,9 +1,11 @@
 package com.project.backend;
 
 import com.project.backend.model.Projekt;
+import com.project.backend.model.Uzytkownik;
 import com.project.backend.repository.ProjektRepository;
 import com.project.backend.repository.ZadanieRepository;
 import com.project.backend.service.ProjektServiceImpl;
+import com.project.backend.service.UzytkownikService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,8 +13,7 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -28,6 +29,9 @@ class ProjektServiceUnitTest {
 
     @InjectMocks
     private ProjektServiceImpl projektService;
+
+    @Mock
+    private UzytkownikService uzytkownikService;
 
     private Projekt projekt;
 
@@ -117,5 +121,72 @@ class ProjektServiceUnitTest {
         assertEquals(1, result.getContent().size());
         verify(projektRepository)
                 .findByNazwaContainingIgnoreCase("test", pageable);
+    }
+    @Test
+    void powinienPrzypisacUzytkownikaDoProjektu() {
+        // given
+        Integer projektId = 1;
+        Integer uzytkownikId = 2;
+
+        Projekt projekt = new Projekt();
+        projekt.setProjektId(projektId);
+        projekt.setUzytkownicy(new HashSet<>());
+
+        Uzytkownik uzytkownik = new Uzytkownik();
+        uzytkownik.setUzytkownikId(uzytkownikId);
+
+        when(projektRepository.findById(projektId))
+                .thenReturn(Optional.of(projekt));
+
+        when(uzytkownikService.getUzytkownik(uzytkownikId))
+                .thenReturn(uzytkownik);
+
+        when(projektRepository.save(projekt))
+                .thenReturn(projekt);
+
+        // when
+        projektService.przypiszUzytkownika(projektId, uzytkownikId);
+
+        // then
+        assertEquals(1, projekt.getUzytkownicy().size());
+        assertTrue(projekt.getUzytkownicy().contains(uzytkownik));
+
+        verify(projektRepository).save(projekt);
+    }
+
+    @Test
+    void powinienUsunacPrzypisanieUzytkownikaZProjektu() {
+        // given
+        Integer projektId = 1;
+        Integer uzytkownikId = 2;
+
+        Uzytkownik uzytkownik1 = new Uzytkownik();
+        uzytkownik1.setUzytkownikId(uzytkownikId);
+
+        Uzytkownik uzytkownik2 = new Uzytkownik();
+        uzytkownik2.setUzytkownikId(3);
+
+        Projekt projekt = new Projekt();
+        projekt.setProjektId(projektId);
+        projekt.setUzytkownicy(new HashSet<>(Set.of(uzytkownik1, uzytkownik2)));
+
+        when(projektRepository.findById(projektId)).thenReturn(Optional.of(projekt));
+
+        when(projektRepository.save(projekt)).thenReturn(projekt);
+
+        // when
+        projektService.usunPrzypisanieUzytkownika(projektId, uzytkownikId);
+
+        // then
+        assertEquals(1, projekt.getUzytkownicy().size());
+
+        assertFalse(projekt.getUzytkownicy()
+                        .stream()
+                        .anyMatch(u -> u.getUzytkownikId().equals(uzytkownikId))
+        );
+
+        assertTrue(projekt.getUzytkownicy().contains(uzytkownik2));
+
+        verify(projektRepository).save(projekt);
     }
 }

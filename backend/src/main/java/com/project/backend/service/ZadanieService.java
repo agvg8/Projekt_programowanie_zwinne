@@ -3,6 +3,7 @@ package com.project.backend.service;
 import com.project.backend.dto.ZadanieDto;
 import com.project.backend.model.Status;
 import com.project.backend.model.Zadanie;
+import jakarta.validation.ValidationException;
 import org.springframework.data.domain.Page;
 
 import java.util.Optional;
@@ -29,5 +30,10 @@ public interface ZadanieService {
 
     Page<Zadanie> searchByNazwa(String nazwa, Pageable pageable);
 
+    void przypiszZadanie(Integer zadanieId, Integer projektId);
+
+    void usunPrzypisanieZadania(Integer zadanieId, Integer projektId) throws ValidationException;
+
     Zadanie updateZadanie(ZadanieDto dto);
+
 }

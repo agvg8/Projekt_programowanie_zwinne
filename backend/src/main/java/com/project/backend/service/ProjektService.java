@@ -14,5 +14,7 @@ public interface ProjektService {
     void deleteProjekt(Integer projektId);
     Page<Projekt> getProjekty(Pageable pageable);
     Page<Projekt> searchByNazwa(String nazwa, Pageable pageable);
+    void przypiszUzytkownika(Integer projektId, Integer uzytkownikId);
+    void usunPrzypisanieUzytkownika(Integer projektId, Integer uzytkownikId);
     Projekt updateProjekt(ProjektDto dto);
 }

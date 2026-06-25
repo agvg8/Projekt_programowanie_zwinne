@@ -6,6 +6,7 @@ import com.project.backend.dto.ZadanieDto;
 import com.project.backend.model.Priorytet;
 import com.project.backend.model.Status;
 import com.project.backend.repository.ZadanieRepository;
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,12 +14,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.project.backend.model.Zadanie;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class ZadanieServiceImpl implements ZadanieService {
     private static final Logger logger = LoggerFactory.getLogger(ZadanieServiceImpl.class);
     private final ZadanieRepository zadanieRepository;
+    private final ProjektService projektService;
 
     @Override
     public Optional<Zadanie> getZadanieOptional(Integer zadanieId) {
@@ -78,6 +81,25 @@ public class ZadanieServiceImpl implements ZadanieService {
     @Override
     public Page<Zadanie> searchByNazwa(String nazwa, Pageable pageable) {
         return zadanieRepository.findByNazwaContainingIgnoreCase(nazwa, pageable);
+    }
+
+    @Override
+    @Transactional
+    public void przypiszZadanie(Integer zadanieId, Integer projektId) {
+        Zadanie zadanie = getZadanie(zadanieId);
+        zadanie.setProjekt(projektService.getProjekt(projektId));
+        setZadanie(zadanie);
+    }
+
+    @Override
+    @Transactional
+    public void usunPrzypisanieZadania(Integer zadanieId, Integer projektId) throws ValidationException {
+        Zadanie zadanie = getZadanie(zadanieId);
+        if (zadanie.getProjekt() == null || !zadanie.getProjekt().getProjektId().equals(projektId)) {
+            throw new ValidationException("Zadanie nie jest przypisane do tego projektu");
+        }
+        zadanie.setProjekt(null);
+        zadanieRepository.save(zadanie);
     }
 
     @Override
