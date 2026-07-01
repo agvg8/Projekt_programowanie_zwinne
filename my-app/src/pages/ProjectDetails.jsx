@@ -1,8 +1,18 @@
 import {useState, useMemo, useEffect} from "react";
 import { updateTaskPriorytet } from "../api/zadanieApi";
-import {fetchProjectTasks} from "../api/projektApi.js";
+import {fetchProjectTasks, updateProject} from "../api/projektApi.js";
+import { FaGoogle } from "react-icons/fa";
 
 export default function ProjectDetails({ project, onBack }) {
+    // lokalny stan projektu
+    const [currentProject, setCurrentProject] = useState(project);
+    const [isEditingDeadline, setIsEditingDeadline] = useState(false);
+    const [tempDeadline, setTempDeadline] = useState("");
+
+    useEffect(() => {
+        setCurrentProject(project);
+        setIsEditingDeadline(false);
+    }, [project]);
 
     // map backend priorytet → UI style
     const mapPriority = (priority) => {
@@ -36,7 +46,8 @@ export default function ProjectDetails({ project, onBack }) {
     }, [search]);
 
     useEffect(() => {
-        fetchProjectTasks(project.id, page, size, debouncedSearch).then((data) => {
+        if (!currentProject?.id) return;
+        fetchProjectTasks(currentProject.id, page, size, debouncedSearch).then((data) => {
             setTasks(data.tasks.map(z => ({
                 id: z.zadanieId,
                 text: z.nazwa,
@@ -46,7 +57,7 @@ export default function ProjectDetails({ project, onBack }) {
             })));
             setTotalPages(data.totalPages);
         });
-    }, [project.id, page, size, debouncedSearch]);
+    }, [currentProject?.id, page, size, debouncedSearch]);
 
     // progress (HIGH = done, bo na razie nie ma logiki done/undone)
     const progress = useMemo(() => {
@@ -82,6 +93,62 @@ export default function ProjectDetails({ project, onBack }) {
         );
     };
 
+    const handleStartEditDeadline = () => {
+        const rawDate = currentProject.data_oddania;
+        const formatted = rawDate ? rawDate.substring(0, 16) : "";
+        setTempDeadline(formatted);
+        setIsEditingDeadline(true);
+    };
+
+    const handleSaveDeadline = async () => {
+        let formattedDeadline = null;
+        if (tempDeadline) {
+            formattedDeadline = tempDeadline.length === 16 ? `${tempDeadline}:00` : tempDeadline;
+        }
+
+        try {
+            await updateProject({
+                projektId: currentProject.id,
+                nazwa: currentProject.nazwa,
+                opis: currentProject.opis,
+                dataOddania: formattedDeadline
+            });
+
+            setCurrentProject(prev => ({
+                ...prev,
+                data_oddania: formattedDeadline
+            }));
+            setIsEditingDeadline(false);
+        } catch (err) {
+            alert("Błąd podczas aktualizacji terminu projektu: " + err.message);
+        }
+    };
+
+    const getGoogleCalendarUrl = (proj) => {
+        if (!proj.data_oddania) return "#";
+        try {
+            const dateObj = new Date(proj.data_oddania);
+            if (isNaN(dateObj.getTime())) return "#";
+
+            // Event ends at the deadline, starts 1 hour earlier
+            const endDate = new Date(dateObj.getTime());
+            const startDate = new Date(dateObj.getTime() - 60 * 60 * 1000);
+
+            const formatUTC = (d) => {
+                return d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+            };
+
+            const dates = `${formatUTC(startDate)}/${formatUTC(endDate)}`;
+            const text = `Deadline: ${proj.nazwa}`;
+            const details = `Opis projektu: ${proj.opis || "Brak opisu."}\n\nTermin oddania: ${proj.data_oddania}`;
+
+            return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(text)}&dates=${dates}&details=${encodeURIComponent(details)}&sf=true&output=xml`;
+        } catch (e) {
+            console.error("Error generating Google Calendar URL:", e);
+            return "#";
+        }
+    };
+
     return (
         <div className="project-details">
 
@@ -94,12 +161,12 @@ export default function ProjectDetails({ project, onBack }) {
 
             {/* TITLE */}
             <h1 className="details-title">
-                {project.nazwa}
+                {currentProject.nazwa}
             </h1>
 
             {/* DESCRIPTION */}
             <p className="project-desc">
-                {project.opis}
+                {currentProject.opis}
             </p>
 
             {/* PROGRESS */}
@@ -121,18 +188,61 @@ export default function ProjectDetails({ project, onBack }) {
             <div className="details-card">
                 <div className="details-row">
                     <span className="label">Created:</span>
-                    <span>{project.data_utworzenia}</span>
+                    <span>{currentProject.data_utworzenia ? new Date(currentProject.data_utworzenia).toLocaleDateString("pl-PL") : "Brak"}</span>
                 </div>
 
-                <div className="details-row">
+                <div className="details-row" style={{ alignItems: "center" }}>
                     <span className="label">Deadline:</span>
-                    <span>{project.data_oddania}</span>
+                    {isEditingDeadline ? (
+                        <div className="deadline-edit-form">
+                            <input
+                                type="datetime-local"
+                                value={tempDeadline}
+                                onChange={(e) => setTempDeadline(e.target.value)}
+                                className="deadline-input"
+                            />
+                            <div className="deadline-edit-actions">
+                                <button className="btn-small save-btn" onClick={handleSaveDeadline}>Zapisz</button>
+                                <button className="btn-small cancel-btn" onClick={() => setIsEditingDeadline(false)}>Anuluj</button>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="deadline-display">
+                            <span className="deadline-val">
+                                {currentProject.data_oddania
+                                    ? new Date(currentProject.data_oddania).toLocaleString("pl-PL", {
+                                        year: "numeric",
+                                        month: "2-digit",
+                                        day: "2-digit",
+                                        hour: "2-digit",
+                                        minute: "2-digit"
+                                      })
+                                    : "Brak"}
+                            </span>
+                            <button className="edit-deadline-btn" onClick={handleStartEditDeadline} title="Edytuj termin">
+                                ✏️
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 <div className="details-row">
                     <span className="label">Tasks:</span>
                     <span>{tasks.length}</span>
                 </div>
+
+                {currentProject.data_oddania && (
+                    <div className="google-calendar-section">
+                        <a
+                            href={getGoogleCalendarUrl(currentProject)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="google-calendar-btn"
+                        >
+                            <FaGoogle className="google-icon" /> Dodaj do Kalendarza Google
+                        </a>
+                    </div>
+                )}
             </div>
 
             {/* TASK LIST */}
