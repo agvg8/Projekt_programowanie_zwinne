@@ -4,14 +4,13 @@ import App from "./App";
 import keycloak from "./keycloak";
 
 keycloak.init({
-    onLoad: "login-required",
-    checkLoginIframe: false
-}).then(() => {
-
+    onLoad: "check-sso",
+    checkLoginIframe: false,
+    pkceMethod: "S256",
+}).then((authenticated) => {
     ReactDOM.createRoot(document.getElementById("root")).render(
         <React.StrictMode>
-            <App keycloak={keycloak} />
+            <App keycloak={keycloak} isKeycloakAuthenticated={authenticated} />
         </React.StrictMode>
     );
-
 });
