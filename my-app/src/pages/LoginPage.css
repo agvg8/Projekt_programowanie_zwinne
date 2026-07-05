@@ -1,14 +1,15 @@
 .login-layout {
   min-height: 100vh;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   position: relative;
-  overflow: hidden;
   background:
     radial-gradient(circle at 12% 18%, rgba(152, 154, 53, 0.4), transparent 45%),
     radial-gradient(circle at 88% 82%, rgba(245, 197, 110, 0.35), transparent 45%),
     linear-gradient(140deg, #f8f3e5 0%, #efe6d3 40%, #e7dcc7 100%);
-  padding: 24px;
+  padding: 40px 24px;
   box-sizing: border-box;
 }
 
@@ -135,6 +136,71 @@
 .login-secondary-action:hover {
   background: rgba(152, 154, 53, 0.15);
   color: #363810;
+}
+
+.login-success {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  background: rgba(40, 160, 80, 0.1);
+  border: 1px solid rgba(40, 160, 80, 0.3);
+  border-radius: 10px;
+  color: #1e7e34;
+  font-size: 14px;
+}
+
+.social-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0 12px;
+  color: #8a7e5e;
+  font-size: 13px;
+}
+
+.social-divider::before,
+.social-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(103, 92, 51, 0.2);
+}
+
+.social-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.social-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 6px;
+  border: 1px solid rgba(103, 92, 51, 0.25);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.8);
+  color: #3e3a2b;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 140ms ease, border-color 140ms ease, transform 140ms ease;
+  white-space: nowrap;
+}
+
+.social-btn:hover {
+  background: #fff;
+  border-color: rgba(103, 92, 51, 0.5);
+  transform: translateY(-1px);
+}
+
+.social-btn-dark {
+  background: rgba(36, 41, 46, 0.06);
+  color: #1a1a1a;
+}
+
+.social-btn-dark:hover {
+  background: rgba(36, 41, 46, 0.14);
 }
 
 @keyframes cardEnter {

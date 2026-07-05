@@ -22,10 +22,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
+
+    private static final Logger logger = Logger.getLogger(AuthService.class.getName());
 
     private final Keycloak keycloak;
 
@@ -72,16 +75,20 @@ public class AuthService {
                 .get(userId)
                 .resetPassword(password);
 
-        RoleRepresentation userRole = realmResource
-                .roles()
-                .get("USER")
-                .toRepresentation();
+        try {
+            RoleRepresentation userRole = realmResource
+                    .roles()
+                    .get("USER")
+                    .toRepresentation();
 
-        realmResource.users()
-                .get(userId)
-                .roles()
-                .realmLevel()
-                .add(List.of(userRole));
+            realmResource.users()
+                    .get(userId)
+                    .roles()
+                    .realmLevel()
+                    .add(List.of(userRole));
+        } catch (jakarta.ws.rs.NotFoundException e) {
+            logger.warning("Rola 'USER' nie istnieje w realm Keycloak — przypisanie roli pominięte");
+        }
 
         Uzytkownik uzytkownik = new Uzytkownik();
         uzytkownik.setImie(request.getName());
