@@ -1,10 +1,10 @@
 import { useState } from "react";
+import keycloak from "../keycloak.js";
 
 export default function EditStudent({
                                         user,
                                         setCurrentPage,
                                     }) {
-
     const [formData, setFormData] =
         useState(user);
 
@@ -16,12 +16,26 @@ export default function EditStudent({
     };
 
     const saveChanges = () => {
-        console.log("save", formData);
-
-        setCurrentPage("admin");
+        fetch("http://localhost:8081/api/uzytkownik/update", {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${keycloak.token}`
+            },
+            body: JSON.stringify({
+                id: formData.uzytkownikId,
+                imie: formData.imie,
+                nazwisko: formData.nazwisko,
+                email: formData.email,
+                rola: formData.rola
+            })
+        }).then(() => {
+            setCurrentPage("admin");
+        });
     };
 
     return (
+
         <div className="edit-user-page">
 
             <h1>Edit User</h1>
@@ -55,13 +69,13 @@ export default function EditStudent({
                 <label>Role</label>
 
                 <select
-                    name="role"
-                    value={formData.role}
+                    name="rola"
+                    value={formData.rola}
                     onChange={handleChange}
                 >
-                    <option>ADMIN</option>
-                    <option>MANAGER</option>
-                    <option>USER</option>
+                    <option value="admin">ADMIN</option>
+                    <option value="manager">MANAGER</option>
+                    <option value="user">USER</option>
                 </select>
 
                 <div className="edit-buttons">
@@ -70,12 +84,12 @@ export default function EditStudent({
                         className="btn save-btn"
                         onClick={saveChanges}
                     >
-                        Save Changes
+                    Save Changes
                     </button>
 
                     <button
                         className="btn back-btn"
-                        onClick={() => setCurrentPage("admin")}
+                        // onClick={() => setCurrentPage("admin")}
                     >
                         Back
                     </button>

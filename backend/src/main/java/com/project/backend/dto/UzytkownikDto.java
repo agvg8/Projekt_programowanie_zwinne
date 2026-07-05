@@ -14,11 +14,22 @@ import lombok.Setter;
 public class UzytkownikDto {
     private Integer id;
     @NotBlank(message = "Imie nie może być puste")
-    private String nazwisko;
-    @NotBlank(message = "Nazwisko nie może być puste")
     private String imie;
+    @NotBlank(message = "Nazwisko nie może być puste")
+    private String nazwisko;
     @Size(max = 50, message = "Email nie może być dłuższy niż {max} znaków!")
     private String email;
     @NotNull
     private RolaUzytkownika rola;
+
+    @Override
+    public String toString() {
+        return "UzytkownikDto{" +
+                "id=" + id +
+                ", nazwisko='" + nazwisko + '\'' +
+                ", imie='" + imie + '\'' +
+                ", email='" + email + '\'' +
+                ", rola=" + rola +
+                '}';
+    }
 }

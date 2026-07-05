@@ -28,7 +28,7 @@ export default function StudentCard({
 
                 <button
                     className="btn-delete"
-                    onClick={() => onDelete(student.studentId)}
+                    onClick={() => onDelete(student.uzytkownikId)}
                 >
                     Delete
                 </button>
