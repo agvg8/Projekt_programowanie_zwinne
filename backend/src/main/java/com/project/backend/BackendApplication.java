@@ -18,14 +18,22 @@ public class BackendApplication {
 	public CommandLineRunner dropConstraints(JdbcTemplate jdbcTemplate) {
 		return args -> {
 			try {
-				jdbcTemplate.execute("ALTER TABLE zadanie DROP CONSTRAINT IF EXISTS zadanie_status_check;");
-				System.out.println("SUCCESSFULLY DROPPED zadanie_status_check CONSTRAINT!");
+				Integer statusCount = jdbcTemplate.queryForObject(
+					"SELECT COUNT(*) FROM pg_constraint WHERE conname = 'zadanie_status_check';", Integer.class);
+				if (statusCount != null && statusCount > 0) {
+					jdbcTemplate.execute("ALTER TABLE zadanie DROP CONSTRAINT IF EXISTS zadanie_status_check;");
+					System.out.println("SUCCESSFULLY DROPPED zadanie_status_check CONSTRAINT!");
+				}
 			} catch (Exception e) {
 				System.err.println("Failed to drop zadanie_status_check: " + e.getMessage());
 			}
 			try {
-				jdbcTemplate.execute("ALTER TABLE zadanie DROP CONSTRAINT IF EXISTS zadanie_priorytet_check;");
-				System.out.println("SUCCESSFULLY DROPPED zadanie_priorytet_check CONSTRAINT!");
+				Integer priorytetCount = jdbcTemplate.queryForObject(
+					"SELECT COUNT(*) FROM pg_constraint WHERE conname = 'zadanie_priorytet_check';", Integer.class);
+				if (priorytetCount != null && priorytetCount > 0) {
+					jdbcTemplate.execute("ALTER TABLE zadanie DROP CONSTRAINT IF EXISTS zadanie_priorytet_check;");
+					System.out.println("SUCCESSFULLY DROPPED zadanie_priorytet_check CONSTRAINT!");
+				}
 			} catch (Exception e) {
 				System.err.println("Failed to drop zadanie_priorytet_check: " + e.getMessage());
 			}

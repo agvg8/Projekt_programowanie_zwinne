@@ -1,5 +1,5 @@
 import {useState, useMemo, useEffect} from "react";
-import { updateTaskPriorytet, fetchTasks, assignUserToTask, removeUserFromTask } from "../api/zadanieApi";
+import { updateTaskPriorytet, fetchTasks, assignUserToTask, removeUserFromTask, updateTaskStatus } from "../api/zadanieApi";
 import {fetchProjectTasks, updateProject, fetchProject} from "../api/projektApi.js";
 import { fetchUsers } from "../api/uzytkownikApi.js";
 import { FaGoogle } from "react-icons/fa";
@@ -137,38 +137,38 @@ export default function ProjectDetails({ project, onBack }) {
         refreshTasks();
     }, [currentProject?.id, page, size, debouncedSearch]);
 
-    // progress (HIGH = done, bo na razie nie ma logiki done/undone)
+    // progress (based on DONE status)
     const progress = useMemo(() => {
         if (!tasks.length) return 0;
 
-        const done = tasks.filter((t) => t.priority === "HIGH").length;
+        const done = tasks.filter((t) => t.status === "DONE").length;
         return Math.round((done / tasks.length) * 100);
     }, [tasks]);
 
-    // zmiana priorytetu
-    const cyclePriority = async (taskId, currentPriority) => {
+    // zmiana statusu
+    const cycleStatus = async (taskId, currentStatus) => {
         const next =
-            currentPriority === "LOW"
-                ? "MEDIUM"
-                : currentPriority === "MEDIUM"
-                    ? "HIGH"
-                    : "LOW";
+            currentStatus === "TODO"
+                ? "IN_PROGRESS"
+                : currentStatus === "IN_PROGRESS"
+                    ? "DONE"
+                    : "TODO";
 
-        // update backend
-        await updateTaskPriorytet(taskId, next);
+        try {
+            // update backend
+            await updateTaskStatus(taskId, next);
 
-        // update UI
-        setTasks((prev) =>
-            prev.map((t) =>
-                t.id === taskId
-                    ? {
-                        ...t,
-                        priority: next,
-                        uiPriority: mapPriority(next),
-                    }
-                    : t
-            )
-        );
+            // update UI
+            setTasks((prev) =>
+                prev.map((t) =>
+                    t.id === taskId
+                        ? { ...t, status: next }
+                        : t
+                )
+            );
+        } catch (err) {
+            alert("Błąd podczas zmiany statusu zadania: " + err.message);
+        }
     };
 
     const handleStartEditDeadline = () => {
@@ -350,7 +350,7 @@ export default function ProjectDetails({ project, onBack }) {
                             key={task.id}
                             className={`task-item ${task.uiPriority}`}
                             onClick={() =>
-                                cyclePriority(task.id, task.priority)
+                                cycleStatus(task.id, task.status)
                             }
                         >
 

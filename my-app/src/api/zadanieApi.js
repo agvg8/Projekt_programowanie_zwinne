@@ -62,4 +62,19 @@ export async function removeUserFromTask(taskId) {
     }
 }
 
+export async function updateTaskStatus(id, status) {
+    const res = await fetch(
+        `http://localhost:8081/api/zadanie/${id}/status?status=${status}`,
+        { 
+            method: "PATCH",
+            headers: {
+                Authorization: `Bearer ${keycloak.token}`
+            }
+        }
+    );
+    if (!res.ok) {
+        throw new Error("Failed to update task status");
+    }
+}
+
 

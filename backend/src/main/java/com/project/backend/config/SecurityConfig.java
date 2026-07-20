@@ -33,6 +33,12 @@ public class SecurityConfig {
                                 "/api/zadanie/*/usun/uzytkownik")
                         .hasAnyRole("USER", "MANAGER", "ADMIN")
 
+                        // zmiana statusu i priorytetu zadań
+                        .requestMatchers(HttpMethod.PATCH,
+                                "/api/zadanie/*/status",
+                                "/api/zadanie/*/priorytet")
+                        .hasAnyRole("USER", "MANAGER", "ADMIN")
+
                         // odczyt projektów i zadań - USER, MANAGER, ADMIN
                         .requestMatchers(HttpMethod.GET,
                                 "/api/projekt/**",
