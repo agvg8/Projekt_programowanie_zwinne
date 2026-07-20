@@ -1,18 +1,71 @@
 import {useState, useMemo, useEffect} from "react";
-import { updateTaskPriorytet } from "../api/zadanieApi";
-import {fetchProjectTasks, updateProject} from "../api/projektApi.js";
-import { FaGoogle } from "react-icons/fa";
+import { updateTaskPriorytet, fetchTasks } from "../api/zadanieApi";
+import {fetchProjectTasks, updateProject, fetchProject, assignUserToProject, removeUserFromProject} from "../api/projektApi.js";
+import { fetchUsers } from "../api/uzytkownikApi.js";
+import { FaGoogle, FaUserPlus, FaUserMinus } from "react-icons/fa";
+import AddTaskModal from "../components/AddTaskModal";
 
 export default function ProjectDetails({ project, onBack }) {
     // lokalny stan projektu
     const [currentProject, setCurrentProject] = useState(project);
     const [isEditingDeadline, setIsEditingDeadline] = useState(false);
     const [tempDeadline, setTempDeadline] = useState("");
+    const [assignedUsers, setAssignedUsers] = useState([]);
+    const [allUsers, setAllUsers] = useState([]);
+    const [selectedUserIdToAssign, setSelectedUserIdToAssign] = useState("");
+    const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
 
+    // Wczytaj szczegóły projektu i wszystkich użytkowników
     useEffect(() => {
-        setCurrentProject(project);
+        if (!project?.id) return;
         setIsEditingDeadline(false);
+
+        // Fetch project details to get latest assigned users
+        fetchProject(project.id)
+            .then((data) => {
+                setCurrentProject(data);
+                setAssignedUsers(data.uzytkownicy || []);
+            })
+            .catch((err) => console.error("Error fetching project details:", err));
+
+        // Fetch all available users in the system
+        fetchUsers()
+            .then((data) => {
+                setAllUsers(data.users || []);
+            })
+            .catch((err) => console.error("Error fetching system users:", err));
     }, [project]);
+
+    const handleAssignUser = async () => {
+        if (!selectedUserIdToAssign) return;
+        try {
+            await assignUserToProject(currentProject.id, Number(selectedUserIdToAssign));
+            // Reload project details to sync state
+            const updatedProject = await fetchProject(currentProject.id);
+            setCurrentProject(updatedProject);
+            setAssignedUsers(updatedProject.uzytkownicy || []);
+            setSelectedUserIdToAssign("");
+        } catch (err) {
+            alert("Błąd przypisywania użytkownika: " + err.message);
+        }
+    };
+
+    const handleRemoveUser = async (userId) => {
+        try {
+            await removeUserFromProject(currentProject.id, userId);
+            // Reload project details to sync state
+            const updatedProject = await fetchProject(currentProject.id);
+            setCurrentProject(updatedProject);
+            setAssignedUsers(updatedProject.uzytkownicy || []);
+        } catch (err) {
+            alert("Błąd usuwania przypisania: " + err.message);
+        }
+    };
+
+    const unassignedUsers = useMemo(() => {
+        const assignedIds = new Set(assignedUsers.map(u => u.uzytkownikId));
+        return allUsers.filter(u => !assignedIds.has(u.uzytkownikId));
+    }, [allUsers, assignedUsers]);
 
     // map backend priorytet → UI style
     const mapPriority = (priority) => {
@@ -45,7 +98,7 @@ export default function ProjectDetails({ project, onBack }) {
         return () => clearTimeout(timer);
     }, [search]);
 
-    useEffect(() => {
+    const refreshTasks = () => {
         if (!currentProject?.id) return;
         fetchProjectTasks(currentProject.id, page, size, debouncedSearch).then((data) => {
             setTasks(data.tasks.map(z => ({
@@ -56,7 +109,11 @@ export default function ProjectDetails({ project, onBack }) {
                 uiPriority: mapPriority(z.priorytet),
             })));
             setTotalPages(data.totalPages);
-        });
+        }).catch(err => console.error("Error fetching project tasks:", err));
+    };
+
+    useEffect(() => {
+        refreshTasks();
     }, [currentProject?.id, page, size, debouncedSearch]);
 
     // progress (HIGH = done, bo na razie nie ma logiki done/undone)
@@ -245,18 +302,79 @@ export default function ProjectDetails({ project, onBack }) {
                 )}
             </div>
 
+            {/* PROJECT MEMBERS */}
+            <div className="members-section">
+                <div className="members-header">
+                    <h2>Członkowie projektu</h2>
+                </div>
+                <div className="details-card members-card">
+                    {assignedUsers.length === 0 ? (
+                        <p className="no-members">Brak przypisanych użytkowników do tego projektu.</p>
+                    ) : (
+                        <div className="members-list">
+                            {assignedUsers.map(user => (
+                                <div key={user.uzytkownikId} className="member-item">
+                                    <div className="member-info">
+                                        <span className="member-name">{user.imie} {user.nazwisko}</span>
+                                        <span className="member-email">{user.email}</span>
+                                        <span className="member-role">Rola: {user.rola}</span>
+                                    </div>
+                                    <button 
+                                        className="btn-remove-user"
+                                        onClick={() => handleRemoveUser(user.uzytkownikId)}
+                                        title="Usuń użytkownika z projektu"
+                                    >
+                                        <FaUserMinus /> Usuń
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    <div className="assign-user-form">
+                        <h3>Przypisz użytkownika do projektu</h3>
+                        <div className="assign-controls">
+                            <select
+                                value={selectedUserIdToAssign}
+                                onChange={(e) => setSelectedUserIdToAssign(e.target.value)}
+                                className="assign-select"
+                            >
+                                <option value="">Wybierz użytkownika...</option>
+                                {unassignedUsers.map(user => (
+                                    <option key={user.uzytkownikId} value={user.uzytkownikId}>
+                                        {user.imie} {user.nazwisko} ({user.email})
+                                    </option>
+                                ))}
+                            </select>
+                            <button
+                                onClick={handleAssignUser}
+                                disabled={!selectedUserIdToAssign}
+                                className="btn-assign-user"
+                            >
+                                <FaUserPlus /> Przypisz
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {/* TASK LIST */}
             <div className="subtasks-section">
                 <div className="tasks-header">
                     <h2>Tasks</h2>
-                    <div className="search-container">
-                        <input
-                            type="text"
-                            placeholder="Search tasks..."
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            className="search-input"
-                        />
+                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                        <button className="btn add-task" style={{ margin: 0 }} onClick={() => setIsAddTaskModalOpen(true)}>
+                            + Nowe zadanie
+                        </button>
+                        <div className="search-container">
+                            <input
+                                type="text"
+                                placeholder="Search tasks..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                className="search-input"
+                            />
+                        </div>
                     </div>
                 </div>
 
@@ -320,6 +438,13 @@ export default function ProjectDetails({ project, onBack }) {
                 )}
             </div>
 
+            <AddTaskModal
+                isOpen={isAddTaskModalOpen}
+                onClose={() => setIsAddTaskModalOpen(false)}
+                projectId={currentProject.id}
+                onTaskCreated={refreshTasks}
+                currentTaskCount={tasks.length}
+            />
         </div>
     );
 }

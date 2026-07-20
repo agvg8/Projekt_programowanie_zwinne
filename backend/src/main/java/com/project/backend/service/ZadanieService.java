@@ -35,5 +35,4 @@ public interface ZadanieService {
     void usunPrzypisanieZadania(Integer zadanieId, Integer projektId) throws ValidationException;
 
     Zadanie updateZadanie(ZadanieDto dto);
-
 }

@@ -22,3 +22,19 @@ export async function updateTaskPriorytet(id, status) {
             }}
     );
 }
+
+export async function createTask(task) {
+    const res = await fetch(BASE_URL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${keycloak.token}`
+        },
+        body: JSON.stringify(task)
+    });
+    if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText || "Failed to create task");
+    }
+}
+

@@ -116,5 +116,4 @@ public class ZadanieController {
         zadanieService.updateZadanie(zadanie);
         return ResponseEntity.ok().build();
     }
-
 }

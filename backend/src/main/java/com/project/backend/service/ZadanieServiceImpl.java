@@ -1,5 +1,6 @@
 package com.project.backend.service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import com.project.backend.dto.ZadanieDto;
@@ -37,6 +38,12 @@ public class ZadanieServiceImpl implements ZadanieService {
 
     @Override
     public Zadanie setZadanie(Zadanie zadanie) {
+        if (zadanie.getZadanieId() == null && zadanie.getProjekt() != null && zadanie.getProjekt().getProjektId() != null) {
+            zadanie.setProjekt(projektService.getProjekt(zadanie.getProjekt().getProjektId()));
+        }
+        if (zadanie.getDataczasDodania() == null) {
+            zadanie.setDataczasDodania(LocalDateTime.now());
+        }
         return zadanieRepository.save(zadanie);
     }
 

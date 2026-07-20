@@ -60,7 +60,11 @@ public class SecurityConfig {
                                 "/api/zadanie/**")
                         .hasAnyRole("MANAGER", "ADMIN")
 
-                        // modyfikacja pól użytkowników
+                        // odczyt użytkowników
+                        .requestMatchers(HttpMethod.GET, "/api/uzytkownik/**")
+                        .hasAnyRole("USER", "MANAGER", "ADMIN")
+
+                        // modyfikacja użytkowników
                         .requestMatchers("/api/uzytkownik/**").hasAnyRole("ADMIN")
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth ->
