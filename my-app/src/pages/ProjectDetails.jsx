@@ -5,6 +5,45 @@ import { fetchUsers } from "../api/uzytkownikApi.js";
 import { FaGoogle } from "react-icons/fa";
 import AddTaskModal from "../components/AddTaskModal";
 
+const mapStatusLabel = (status) => {
+    switch (status) {
+        case "TODO":
+            return "TODO";
+        case "IN_PROGRESS":
+            return "WIP";
+        case "DONE":
+            return "DONE";
+        default:
+            return status || "TODO";
+    }
+};
+
+const getStatusBg = (status) => {
+    switch (status) {
+        case "TODO":
+            return "#e2e8f0";
+        case "IN_PROGRESS":
+            return "#feebc8";
+        case "DONE":
+            return "#c6f6d5";
+        default:
+            return "#e2e8f0";
+    }
+};
+
+const getStatusColor = (status) => {
+    switch (status) {
+        case "TODO":
+            return "#4a5568";
+        case "IN_PROGRESS":
+            return "#c05621";
+        case "DONE":
+            return "#22543d";
+        default:
+            return "#4a5568";
+    }
+};
+
 export default function ProjectDetails({ project, onBack }) {
     // lokalny stan projektu
     const [currentProject, setCurrentProject] = useState(project);
@@ -86,6 +125,7 @@ export default function ProjectDetails({ project, onBack }) {
                 opis: z.opis,
                 priority: z.priorytet,
                 uiPriority: mapPriority(z.priorytet),
+                status: z.status,
                 assignedUserId: z.uzytkownik ? z.uzytkownik.uzytkownikId : "",
                 assignedUserName: z.uzytkownik ? `${z.uzytkownik.imie} ${z.uzytkownik.nazwisko}` : "Brak"
             })));
@@ -345,8 +385,22 @@ export default function ProjectDetails({ project, onBack }) {
                             </div>
 
                             {/* RIGHT */}
-                            <div className="task-priority">
-                                {task.priority}
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px', justifyContent: 'center' }}>
+                                <div style={{ 
+                                    fontSize: '11px', 
+                                    fontWeight: 'bold', 
+                                    padding: '3px 8px', 
+                                    borderRadius: '12px', 
+                                    textTransform: 'uppercase', 
+                                    background: getStatusBg(task.status), 
+                                    color: getStatusColor(task.status),
+                                    boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                                }}>
+                                    {mapStatusLabel(task.status)}
+                                </div>
+                                <div className="task-priority">
+                                    Prio: {task.priority}
+                                </div>
                             </div>
 
                         </div>

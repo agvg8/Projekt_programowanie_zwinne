@@ -2,10 +2,15 @@ import { useState } from "react";
 import { createProject } from "../api/projektApi";
 
 export default function AddProjectModal({ isOpen, onClose, onProjectCreated }) {
+    const getTodayDateTimeString = () => {
+        const tzoffset = (new Date()).getTimezoneOffset() * 60000;
+        return (new Date(Date.now() - tzoffset)).toISOString().slice(0, 16);
+    };
+
     const [formData, setFormData] = useState({
         nazwa: "",
         opis: "",
-        data_oddania: ""
+        data_oddania: getTodayDateTimeString()
     });
     const [error, setError] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -38,7 +43,7 @@ export default function AddProjectModal({ isOpen, onClose, onProjectCreated }) {
             };
             await createProject(projectData);
             onProjectCreated();
-            setFormData({ nazwa: "", opis: "", data_oddania: "" });
+            setFormData({ nazwa: "", opis: "", data_oddania: getTodayDateTimeString() });
             onClose();
         } catch (err) {
             setError(err.message || "Błąd podczas tworzenia projektu");
