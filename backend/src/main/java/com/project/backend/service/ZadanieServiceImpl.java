@@ -23,6 +23,7 @@ public class ZadanieServiceImpl implements ZadanieService {
     private static final Logger logger = LoggerFactory.getLogger(ZadanieServiceImpl.class);
     private final ZadanieRepository zadanieRepository;
     private final ProjektService projektService;
+    private final UzytkownikService uzytkownikService;
 
     @Override
     public Optional<Zadanie> getZadanieOptional(Integer zadanieId) {
@@ -118,5 +119,21 @@ public class ZadanieServiceImpl implements ZadanieService {
         zadanie.setDataczasDodania(dto.getDataOddania());
         zadanie = setZadanie(zadanie);
         return zadanie;
+    }
+
+    @Override
+    @Transactional
+    public void przypiszUzytkownika(Integer zadanieId, Integer uzytkownikId) {
+        Zadanie zadanie = getZadanie(zadanieId);
+        zadanie.setUzytkownik(uzytkownikService.getUzytkownik(uzytkownikId));
+        zadanieRepository.save(zadanie);
+    }
+
+    @Override
+    @Transactional
+    public void usunPrzypisanieUzytkownika(Integer zadanieId) {
+        Zadanie zadanie = getZadanie(zadanieId);
+        zadanie.setUzytkownik(null);
+        zadanieRepository.save(zadanie);
     }
 }

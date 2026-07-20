@@ -27,10 +27,10 @@ public class SecurityConfig {
                         // rejestracja - ALL (no auth)
                         .requestMatchers("/auth/register").permitAll()
 
-                        // przypisywanie użytkownika do projektu
+                        // przypisywanie zadania do użytkownika
                         .requestMatchers(HttpMethod.PATCH,
-                                "/api/projekt/*/przypisz/uzytkownik/*",
-                                "/api/projekt/*/usun/uzytkownik/*")
+                                "/api/zadanie/*/przypisz/uzytkownik/*",
+                                "/api/zadanie/*/usun/uzytkownik")
                         .hasAnyRole("USER", "MANAGER", "ADMIN")
 
                         // odczyt projektów i zadań - USER, MANAGER, ADMIN

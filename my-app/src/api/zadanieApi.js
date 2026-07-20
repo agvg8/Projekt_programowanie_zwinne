@@ -37,4 +37,29 @@ export async function createTask(task) {
         throw new Error(errorText || "Failed to create task");
     }
 }
+
+export async function assignUserToTask(taskId, userId) {
+    const res = await fetch(`http://localhost:8081/api/zadanie/${taskId}/przypisz/uzytkownik/${userId}`, {
+        method: "PATCH",
+        headers: {
+            Authorization: `Bearer ${keycloak.token}`
+        }
+    });
+    if (!res.ok) {
+        throw new Error("Failed to assign user to task");
+    }
+}
+
+export async function removeUserFromTask(taskId) {
+    const res = await fetch(`http://localhost:8081/api/zadanie/${taskId}/usun/uzytkownik`, {
+        method: "PATCH",
+        headers: {
+            Authorization: `Bearer ${keycloak.token}`
+        }
+    });
+    if (!res.ok) {
+        throw new Error("Failed to remove user from task");
+    }
+}
+
 

@@ -1,8 +1,8 @@
 import {useState, useMemo, useEffect} from "react";
-import { updateTaskPriorytet, fetchTasks } from "../api/zadanieApi";
-import {fetchProjectTasks, updateProject, fetchProject, assignUserToProject, removeUserFromProject} from "../api/projektApi.js";
+import { updateTaskPriorytet, fetchTasks, assignUserToTask, removeUserFromTask } from "../api/zadanieApi";
+import {fetchProjectTasks, updateProject, fetchProject} from "../api/projektApi.js";
 import { fetchUsers } from "../api/uzytkownikApi.js";
-import { FaGoogle, FaUserPlus, FaUserMinus } from "react-icons/fa";
+import { FaGoogle } from "react-icons/fa";
 import AddTaskModal from "../components/AddTaskModal";
 
 export default function ProjectDetails({ project, onBack }) {
@@ -10,9 +10,7 @@ export default function ProjectDetails({ project, onBack }) {
     const [currentProject, setCurrentProject] = useState(project);
     const [isEditingDeadline, setIsEditingDeadline] = useState(false);
     const [tempDeadline, setTempDeadline] = useState("");
-    const [assignedUsers, setAssignedUsers] = useState([]);
     const [allUsers, setAllUsers] = useState([]);
-    const [selectedUserIdToAssign, setSelectedUserIdToAssign] = useState("");
     const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
 
     // Wczytaj szczegóły projektu i wszystkich użytkowników
@@ -20,11 +18,10 @@ export default function ProjectDetails({ project, onBack }) {
         if (!project?.id) return;
         setIsEditingDeadline(false);
 
-        // Fetch project details to get latest assigned users
+        // Fetch project details
         fetchProject(project.id)
             .then((data) => {
                 setCurrentProject(data);
-                setAssignedUsers(data.uzytkownicy || []);
             })
             .catch((err) => console.error("Error fetching project details:", err));
 
@@ -36,36 +33,18 @@ export default function ProjectDetails({ project, onBack }) {
             .catch((err) => console.error("Error fetching system users:", err));
     }, [project]);
 
-    const handleAssignUser = async () => {
-        if (!selectedUserIdToAssign) return;
+    const handleAssignUserToTask = async (taskId, userId) => {
         try {
-            await assignUserToProject(currentProject.id, Number(selectedUserIdToAssign));
-            // Reload project details to sync state
-            const updatedProject = await fetchProject(currentProject.id);
-            setCurrentProject(updatedProject);
-            setAssignedUsers(updatedProject.uzytkownicy || []);
-            setSelectedUserIdToAssign("");
+            if (userId) {
+                await assignUserToTask(taskId, Number(userId));
+            } else {
+                await removeUserFromTask(taskId);
+            }
+            refreshTasks();
         } catch (err) {
-            alert("Błąd przypisywania użytkownika: " + err.message);
+            alert("Błąd przypisywania użytkownika do zadania: " + err.message);
         }
     };
-
-    const handleRemoveUser = async (userId) => {
-        try {
-            await removeUserFromProject(currentProject.id, userId);
-            // Reload project details to sync state
-            const updatedProject = await fetchProject(currentProject.id);
-            setCurrentProject(updatedProject);
-            setAssignedUsers(updatedProject.uzytkownicy || []);
-        } catch (err) {
-            alert("Błąd usuwania przypisania: " + err.message);
-        }
-    };
-
-    const unassignedUsers = useMemo(() => {
-        const assignedIds = new Set(assignedUsers.map(u => u.uzytkownikId));
-        return allUsers.filter(u => !assignedIds.has(u.uzytkownikId));
-    }, [allUsers, assignedUsers]);
 
     // map backend priorytet → UI style
     const mapPriority = (priority) => {
@@ -107,6 +86,8 @@ export default function ProjectDetails({ project, onBack }) {
                 opis: z.opis,
                 priority: z.priorytet,
                 uiPriority: mapPriority(z.priorytet),
+                assignedUserId: z.uzytkownik ? z.uzytkownik.uzytkownikId : "",
+                assignedUserName: z.uzytkownik ? `${z.uzytkownik.imie} ${z.uzytkownik.nazwisko}` : "Brak"
             })));
             setTotalPages(data.totalPages);
         }).catch(err => console.error("Error fetching project tasks:", err));
@@ -302,61 +283,6 @@ export default function ProjectDetails({ project, onBack }) {
                 )}
             </div>
 
-            {/* PROJECT MEMBERS */}
-            <div className="members-section">
-                <div className="members-header">
-                    <h2>Członkowie projektu</h2>
-                </div>
-                <div className="details-card members-card">
-                    {assignedUsers.length === 0 ? (
-                        <p className="no-members">Brak przypisanych użytkowników do tego projektu.</p>
-                    ) : (
-                        <div className="members-list">
-                            {assignedUsers.map(user => (
-                                <div key={user.uzytkownikId} className="member-item">
-                                    <div className="member-info">
-                                        <span className="member-name">{user.imie} {user.nazwisko}</span>
-                                        <span className="member-email">{user.email}</span>
-                                        <span className="member-role">Rola: {user.rola}</span>
-                                    </div>
-                                    <button 
-                                        className="btn-remove-user"
-                                        onClick={() => handleRemoveUser(user.uzytkownikId)}
-                                        title="Usuń użytkownika z projektu"
-                                    >
-                                        <FaUserMinus /> Usuń
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-
-                    <div className="assign-user-form">
-                        <h3>Przypisz użytkownika do projektu</h3>
-                        <div className="assign-controls">
-                            <select
-                                value={selectedUserIdToAssign}
-                                onChange={(e) => setSelectedUserIdToAssign(e.target.value)}
-                                className="assign-select"
-                            >
-                                <option value="">Wybierz użytkownika...</option>
-                                {unassignedUsers.map(user => (
-                                    <option key={user.uzytkownikId} value={user.uzytkownikId}>
-                                        {user.imie} {user.nazwisko} ({user.email})
-                                    </option>
-                                ))}
-                            </select>
-                            <button
-                                onClick={handleAssignUser}
-                                disabled={!selectedUserIdToAssign}
-                                className="btn-assign-user"
-                            >
-                                <FaUserPlus /> Przypisz
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             {/* TASK LIST */}
             <div className="subtasks-section">
@@ -397,6 +323,25 @@ export default function ProjectDetails({ project, onBack }) {
                                 <div className="task-desc">
                                     {task.opis || "No description"}
                                 </div>
+                            </div>
+
+                            {/* MIDDLE: User Assignment */}
+                            <div className="task-user-assignment" onClick={(e) => e.stopPropagation()}>
+                                <label style={{ fontSize: '11px', fontWeight: '600', color: '#6b6b6b', display: 'block', marginBottom: '4px' }}>
+                                    Przypisany:
+                                </label>
+                                <select
+                                    value={task.assignedUserId || ""}
+                                    onChange={(e) => handleAssignUserToTask(task.id, e.target.value)}
+                                    className="task-user-select"
+                                >
+                                    <option value="">Brak przypisania</option>
+                                    {allUsers.map(u => (
+                                        <option key={u.uzytkownikId} value={u.uzytkownikId}>
+                                            {u.imie} {u.nazwisko}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
 
                             {/* RIGHT */}

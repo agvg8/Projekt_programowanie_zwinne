@@ -533,6 +533,39 @@ body, html {
   color: #777;
 }
 
+.task-user-assignment {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  margin: 0 16px;
+  min-width: 150px;
+}
+
+.task-user-select {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 12px;
+  background-color: #fff;
+  color: var(--text-main);
+  cursor: pointer;
+  width: 100%;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.task-user-select option {
+  color: var(--text-main);
+  background-color: #fff;
+}
+
+.task-user-select:focus {
+  outline: none;
+  border-color: #989a35;
+  box-shadow: 0 0 0 2px rgba(152, 154, 53, 0.2);
+}
+
 /* STATUS COLORS */
 .task-item.low {
   background: #e6f7ea;
