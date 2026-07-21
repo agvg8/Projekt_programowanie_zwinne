@@ -976,3 +976,29 @@ h1, h2, .title {
   color: #1f1f1f;
   margin-bottom: 20px;
 }
+
+.task-right{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.task-action{
+  border:none;
+  background:none;
+  cursor:pointer;
+  font-size:18px;
+  transition:.2s;
+}
+
+.task-action:hover{
+  transform:scale(1.15);
+}
+
+.task-action.edit{
+  color:#3b82f6;
+}
+
+.task-action.delete{
+  color:#ef4444;
+}

@@ -12,7 +12,7 @@ export async function fetchProjects(page = 0, size = 10, search = "") {
         headers: authHeaders()
     });
     const data = await res.json();
-    console.log(data)
+    // console.log(data)
     return {
         projects: data.content.map((p) => ({
             id: p.projektId,
@@ -96,5 +96,16 @@ export async function updateProject(projectDto) {
     if (!res.ok) {
         throw new Error("Update failed");
     }
+}
+
+export async function getProjects() {
+    const response = await fetch(BASE_URL, {
+        headers: authHeaders()
+    });
+    if (!response.ok) {
+        throw new Error("Nie udało się pobrać projektów");
+    }
+    const data = await response.json();
+    return data.content;
 }
 

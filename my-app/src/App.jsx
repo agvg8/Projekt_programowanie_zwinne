@@ -13,6 +13,7 @@ import ProjectDetails from "./pages/ProjectDetails";
 import AdminPanel from "./pages/AdminPanel";
 import EditStudent from "./pages/EditStudent";
 import { fetchProjects } from "./api/projektApi";
+import AddTaskPage from "./pages/AddTask/AddTask";
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -20,6 +21,7 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState("dashboard");
   const [background, setBackground] = useState("/bg1.jpg");
   const [selectedTask, setSelectedTask] = useState(null);
+  const [editedTask, setEditedTask] = useState(null);
   const [projects, setProjects] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [page, setPage] = useState(0);
@@ -81,7 +83,7 @@ export default function App() {
 
 
         <main className="main-content">
-          <TopBar />
+          <TopBar setCurrentPage={setCurrentPage} />
 
           {currentPage === "dashboard" && (
             <>
@@ -134,10 +136,12 @@ export default function App() {
           )}
 
           {currentPage === "details" && selectedTask && (
-            <ProjectDetails
-            project={selectedTask}
-            onBack={() => setCurrentPage("dashboard")}
-            />
+              <ProjectDetails
+                  project={selectedTask}
+                  onBack={() => setCurrentPage("dashboard")}
+                  setCurrentPage={setCurrentPage}
+                  setEditedTask={setEditedTask}
+              />
            )}
 
           {currentPage === "settings" && (
@@ -161,6 +165,13 @@ export default function App() {
                   />
               )
           }
+
+          {currentPage === "addTask" && (
+              <AddTaskPage
+                  task={editedTask}
+                  setCurrentPage={setCurrentPage}
+              />
+          )}
 
 
         </main>

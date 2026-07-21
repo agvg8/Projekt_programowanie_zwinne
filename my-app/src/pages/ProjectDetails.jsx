@@ -1,9 +1,15 @@
 import {useState, useMemo, useEffect} from "react";
-import { updateTaskPriorytet } from "../api/zadanieApi";
+import { updateTaskPriorytet, deleteTask } from "../api/zadanieApi";
 import {fetchProjectTasks, updateProject} from "../api/projektApi.js";
 import { FaGoogle } from "react-icons/fa";
 
-export default function ProjectDetails({ project, onBack }) {
+
+export default function ProjectDetails({
+                                           project,
+                                           onBack,
+                                           setCurrentPage,
+                                           setEditedTask
+                                       }) {
     // lokalny stan projektu
     const [currentProject, setCurrentProject] = useState(project);
     const [isEditingDeadline, setIsEditingDeadline] = useState(false);
@@ -13,6 +19,28 @@ export default function ProjectDetails({ project, onBack }) {
         setCurrentProject(project);
         setIsEditingDeadline(false);
     }, [project]);
+
+    const handleEditTask = (task, e) => {
+        e.stopPropagation();
+
+        setEditedTask(task);
+        setCurrentPage("addTask");
+    };
+
+    const handleDeleteTask = async (taskId, e) => {
+        e.stopPropagation();
+
+        if (!window.confirm("Usunąć zadanie?")) return;
+
+        try {
+            await deleteTask(taskId);
+
+            setTasks(prev => prev.filter(t => t.id !== taskId));
+        } catch (err) {
+            alert(err.message);
+        }
+    };
+
 
     // map backend priorytet → UI style
     const mapPriority = (priority) => {
@@ -54,6 +82,7 @@ export default function ProjectDetails({ project, onBack }) {
                 opis: z.opis,
                 priority: z.priorytet,
                 uiPriority: mapPriority(z.priorytet),
+                original: z
             })));
             setTotalPages(data.totalPages);
         });
@@ -282,18 +311,35 @@ export default function ProjectDetails({ project, onBack }) {
                             </div>
 
                             {/* RIGHT */}
-                            <div className="task-priority">
-                                {task.priority}
-                            </div>
+                            <div className="task-right">
 
+                                <div className="task-priority">
+                                    {task.priority}
+                                </div>
+
+                                <button
+                                    className="task-action edit"
+                                    onClick={(e) => handleEditTask(task.original, e)}
+                                >
+                                    ✏️
+                                </button>
+
+                                <button
+                                    className="task-action delete"
+                                    onClick={(e) => handleDeleteTask(task.id, e)}
+                                >
+                                    🗑️
+                                </button>
+
+                            </div>
                         </div>
                     ))}
                 </div>
 
                 {totalPages > 0 && (
                     <div className="pagination">
-                        <button 
-                            onClick={() => setPage(p => Math.max(0, p - 1))} 
+                        <button
+                            onClick={() => setPage(p => Math.max(0, p - 1))}
                             disabled={page === 0}
                         >
                             Poprzednia
