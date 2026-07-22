@@ -11,9 +11,10 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ProjectDetails from "./pages/ProjectDetails";
 import { fetchProjects } from "./api/projektApi";
+import AddProjectModal from "./components/AddProjectModal";
 
-export default function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+export default function App({ keycloak }) {
+  const [isAuthenticated, setIsAuthenticated] = useState(keycloak?.authenticated || false);
   const [authPage, setAuthPage] = useState("login");
   const [currentPage, setCurrentPage] = useState("dashboard");
   const [background, setBackground] = useState("/bg1.jpg");
@@ -22,6 +23,7 @@ export default function App() {
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   useEffect(() => {
     document.body.style.backgroundImage = `url(${background})`;
@@ -38,20 +40,67 @@ export default function App() {
     return () => clearTimeout(timer);
   }, [search]);
 
-  useEffect(() => {
+  const refreshProjects = () => {
+    if (!isAuthenticated) return;
     fetchProjects(page, size, debouncedSearch).then(data => {
       setProjects(data.projects);
       setTotalPages(data.totalPages);
-    });
-  }, [page, size, debouncedSearch]);
+    }).catch(err => console.error("Error fetching projects:", err));
+  };
 
-  const handleLogin = (username, password) => {
-    if (username === "admin" && password === "admin") {
+  useEffect(() => {
+    refreshProjects();
+  }, [page, size, debouncedSearch, isAuthenticated]);
+
+  const handleLogin = async (username, password) => {
+    try {
+      const response = await fetch("http://localhost:8080/realms/programowanie-zwinne/protocol/openid-connect/token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams({
+          client_id: "react-frontend",
+          grant_type: "password",
+          username: username,
+          password: password,
+          scope: "openid"
+        })
+      });
+
+      if (!response.ok) {
+        let msg = "Błędny login lub hasło";
+        try {
+          const errData = await response.json();
+          if (errData.error_description) {
+            msg = errData.error_description;
+          }
+        } catch (_) {}
+        return { success: false, message: msg };
+      }
+
+      const data = await response.json();
+      localStorage.setItem("kc_token", data.access_token);
+      localStorage.setItem("kc_refreshToken", data.refresh_token);
+
+      keycloak.token = data.access_token;
+      keycloak.refreshToken = data.refresh_token;
+      keycloak.idToken = data.id_token;
+      keycloak.authenticated = true;
+
       setIsAuthenticated(true);
       return { success: true };
+    } catch (err) {
+      console.error("Login error:", err);
+      return { success: false, message: "Błąd połączenia z serwerem logowania" };
     }
+  };
 
-    return { success: false, message: "Nieprawidlowy login lub haslo" };
+  const handleLogout = () => {
+    localStorage.removeItem("kc_token");
+    localStorage.removeItem("kc_refreshToken");
+    setIsAuthenticated(false);
+    keycloak.logout();
   };
 
   if (!isAuthenticated) {
@@ -77,20 +126,25 @@ export default function App() {
         <Sidebar setCurrentPage={setCurrentPage} />
 
         <main className="main-content">
-          <TopBar />
+          <TopBar onLogout={handleLogout} />
 
           {currentPage === "dashboard" && (
             <>
               <div className="dashboard-header">
                 <h1 className="title">My Projects</h1>
-                <div className="search-container">
-                  <input
-                    type="text"
-                    placeholder="Search projects..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="search-input"
-                  />
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                  <button className="btn add-task" style={{ margin: 0 }} onClick={() => setIsAddModalOpen(true)}>
+                    + Nowy Projekt
+                  </button>
+                  <div className="search-container">
+                    <input
+                      type="text"
+                      placeholder="Search projects..."
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      className="search-input"
+                    />
+                  </div>
                 </div>
               </div>
               <TaskList
@@ -143,6 +197,12 @@ export default function App() {
 
         </main>
       </div>
+
+      <AddProjectModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onProjectCreated={refreshProjects}
+      />
     </div>
   );
 }

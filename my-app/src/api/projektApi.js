@@ -20,11 +20,32 @@ export async function fetchProjects(page = 0, size = 10, search = "") {
             opis: p.opis,
             data_oddania: p.data_oddania,
             data_utworzenia: p.data_utworzenia,
-            zadania: p.zadania || []
+            zadania: p.zadania || [],
+            uzytkownicy: p.uzytkownicy || []
         })),
         totalPages: data.totalPages
     };
 }
+
+export async function fetchProject(projectId) {
+    const res = await fetch(`${BASE_URL}/${projectId}`, {
+        headers: authHeaders()
+    });
+    if (!res.ok) {
+        throw new Error("Failed to fetch project details");
+    }
+    const p = await res.json();
+    return {
+        id: p.projektId,
+        nazwa: p.nazwa,
+        opis: p.opis,
+        data_oddania: p.data_oddania,
+        data_utworzenia: p.data_utworzenia,
+        zadania: p.zadania || [],
+        uzytkownicy: p.uzytkownicy || []
+    };
+}
+
 
 export async function fetchProjectTasks(projectId, page = 0, size = 10, search = "") {
     const query = search ? `&nazwa=${encodeURIComponent(search)}` : "";
@@ -97,4 +118,54 @@ export async function updateProject(projectDto) {
         throw new Error("Update failed");
     }
 }
+
+export async function createProject(project) {
+    const res = await fetch(BASE_URL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            ...authHeaders()
+        },
+        body: JSON.stringify(project)
+    });
+
+    if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText || "Failed to create project");
+    }
+}
+
+export async function deleteProject(projectId) {
+    const res = await fetch(`${BASE_URL}/${projectId}`, {
+        method: "DELETE",
+        headers: authHeaders()
+    });
+
+    if (!res.ok) {
+        throw new Error("Failed to delete project");
+    }
+}
+
+export async function assignUserToProject(projectId, userId) {
+    const res = await fetch(`${BASE_URL}/${projectId}/przypisz/uzytkownik/${userId}`, {
+        method: "PATCH",
+        headers: authHeaders()
+    });
+
+    if (!res.ok) {
+        throw new Error("Failed to assign user to project");
+    }
+}
+
+export async function removeUserFromProject(projectId, userId) {
+    const res = await fetch(`${BASE_URL}/${projectId}/usun/uzytkownik/${userId}`, {
+        method: "PATCH",
+        headers: authHeaders()
+    });
+
+    if (!res.ok) {
+        throw new Error("Failed to remove user from project");
+    }
+}
+
 

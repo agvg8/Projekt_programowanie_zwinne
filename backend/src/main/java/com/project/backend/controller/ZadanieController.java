@@ -117,4 +117,15 @@ public class ZadanieController {
         return ResponseEntity.ok().build();
     }
 
+    @PatchMapping("/{zadanieId}/przypisz/uzytkownik/{uzytkownikId}")
+    public ResponseEntity<Void> przypiszUzytkownika(@PathVariable Integer zadanieId, @PathVariable Integer uzytkownikId) {
+        zadanieService.przypiszUzytkownika(zadanieId, uzytkownikId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{zadanieId}/usun/uzytkownik")
+    public ResponseEntity<Void> usunUzytkownika(@PathVariable Integer zadanieId) {
+        zadanieService.usunPrzypisanieUzytkownika(zadanieId);
+        return ResponseEntity.ok().build();
+    }
 }

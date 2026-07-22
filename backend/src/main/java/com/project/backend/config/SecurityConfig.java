@@ -27,10 +27,16 @@ public class SecurityConfig {
                         // rejestracja - ALL (no auth)
                         .requestMatchers("/auth/register").permitAll()
 
-                        // przypisywanie użytkownika do projektu
+                        // przypisywanie zadania do użytkownika
                         .requestMatchers(HttpMethod.PATCH,
-                                "/api/projekt/*/przypisz/uzytkownik/*",
-                                "/api/projekt/*/usun/uzytkownik/*")
+                                "/api/zadanie/*/przypisz/uzytkownik/*",
+                                "/api/zadanie/*/usun/uzytkownik")
+                        .hasAnyRole("USER", "MANAGER", "ADMIN")
+
+                        // zmiana statusu i priorytetu zadań
+                        .requestMatchers(HttpMethod.PATCH,
+                                "/api/zadanie/*/status",
+                                "/api/zadanie/*/priorytet")
                         .hasAnyRole("USER", "MANAGER", "ADMIN")
 
                         // odczyt projektów i zadań - USER, MANAGER, ADMIN
@@ -60,7 +66,11 @@ public class SecurityConfig {
                                 "/api/zadanie/**")
                         .hasAnyRole("MANAGER", "ADMIN")
 
-                        // modyfikacja pól użytkowników
+                        // odczyt użytkowników
+                        .requestMatchers(HttpMethod.GET, "/api/uzytkownik/**")
+                        .hasAnyRole("USER", "MANAGER", "ADMIN")
+
+                        // modyfikacja użytkowników
                         .requestMatchers("/api/uzytkownik/**").hasAnyRole("ADMIN")
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth ->

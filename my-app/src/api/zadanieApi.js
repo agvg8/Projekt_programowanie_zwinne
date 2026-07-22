@@ -22,3 +22,59 @@ export async function updateTaskPriorytet(id, status) {
             }}
     );
 }
+
+export async function createTask(task) {
+    const res = await fetch(BASE_URL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${keycloak.token}`
+        },
+        body: JSON.stringify(task)
+    });
+    if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText || "Failed to create task");
+    }
+}
+
+export async function assignUserToTask(taskId, userId) {
+    const res = await fetch(`http://localhost:8081/api/zadanie/${taskId}/przypisz/uzytkownik/${userId}`, {
+        method: "PATCH",
+        headers: {
+            Authorization: `Bearer ${keycloak.token}`
+        }
+    });
+    if (!res.ok) {
+        throw new Error("Failed to assign user to task");
+    }
+}
+
+export async function removeUserFromTask(taskId) {
+    const res = await fetch(`http://localhost:8081/api/zadanie/${taskId}/usun/uzytkownik`, {
+        method: "PATCH",
+        headers: {
+            Authorization: `Bearer ${keycloak.token}`
+        }
+    });
+    if (!res.ok) {
+        throw new Error("Failed to remove user from task");
+    }
+}
+
+export async function updateTaskStatus(id, status) {
+    const res = await fetch(
+        `http://localhost:8081/api/zadanie/${id}/status?status=${status}`,
+        { 
+            method: "PATCH",
+            headers: {
+                Authorization: `Bearer ${keycloak.token}`
+            }
+        }
+    );
+    if (!res.ok) {
+        throw new Error("Failed to update task status");
+    }
+}
+
+

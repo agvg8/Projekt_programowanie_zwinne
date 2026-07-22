@@ -1,18 +1,89 @@
 import {useState, useMemo, useEffect} from "react";
-import { updateTaskPriorytet } from "../api/zadanieApi";
-import {fetchProjectTasks, updateProject} from "../api/projektApi.js";
+import { updateTaskPriorytet, fetchTasks, assignUserToTask, removeUserFromTask, updateTaskStatus } from "../api/zadanieApi";
+import {fetchProjectTasks, updateProject, fetchProject} from "../api/projektApi.js";
+import { fetchUsers } from "../api/uzytkownikApi.js";
 import { FaGoogle } from "react-icons/fa";
+import AddTaskModal from "../components/AddTaskModal";
+
+const mapStatusLabel = (status) => {
+    switch (status) {
+        case "TODO":
+            return "TODO";
+        case "IN_PROGRESS":
+            return "WIP";
+        case "DONE":
+            return "DONE";
+        default:
+            return status || "TODO";
+    }
+};
+
+const getStatusBg = (status) => {
+    switch (status) {
+        case "TODO":
+            return "#e2e8f0";
+        case "IN_PROGRESS":
+            return "#feebc8";
+        case "DONE":
+            return "#c6f6d5";
+        default:
+            return "#e2e8f0";
+    }
+};
+
+const getStatusColor = (status) => {
+    switch (status) {
+        case "TODO":
+            return "#4a5568";
+        case "IN_PROGRESS":
+            return "#c05621";
+        case "DONE":
+            return "#22543d";
+        default:
+            return "#4a5568";
+    }
+};
 
 export default function ProjectDetails({ project, onBack }) {
     // lokalny stan projektu
     const [currentProject, setCurrentProject] = useState(project);
     const [isEditingDeadline, setIsEditingDeadline] = useState(false);
     const [tempDeadline, setTempDeadline] = useState("");
+    const [allUsers, setAllUsers] = useState([]);
+    const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
 
+    // Wczytaj szczegóły projektu i wszystkich użytkowników
     useEffect(() => {
-        setCurrentProject(project);
+        if (!project?.id) return;
         setIsEditingDeadline(false);
+
+        // Fetch project details
+        fetchProject(project.id)
+            .then((data) => {
+                setCurrentProject(data);
+            })
+            .catch((err) => console.error("Error fetching project details:", err));
+
+        // Fetch all available users in the system
+        fetchUsers()
+            .then((data) => {
+                setAllUsers(data.users || []);
+            })
+            .catch((err) => console.error("Error fetching system users:", err));
     }, [project]);
+
+    const handleAssignUserToTask = async (taskId, userId) => {
+        try {
+            if (userId) {
+                await assignUserToTask(taskId, Number(userId));
+            } else {
+                await removeUserFromTask(taskId);
+            }
+            refreshTasks();
+        } catch (err) {
+            alert("Błąd przypisywania użytkownika do zadania: " + err.message);
+        }
+    };
 
     // map backend priorytet → UI style
     const mapPriority = (priority) => {
@@ -45,7 +116,7 @@ export default function ProjectDetails({ project, onBack }) {
         return () => clearTimeout(timer);
     }, [search]);
 
-    useEffect(() => {
+    const refreshTasks = () => {
         if (!currentProject?.id) return;
         fetchProjectTasks(currentProject.id, page, size, debouncedSearch).then((data) => {
             setTasks(data.tasks.map(z => ({
@@ -54,43 +125,50 @@ export default function ProjectDetails({ project, onBack }) {
                 opis: z.opis,
                 priority: z.priorytet,
                 uiPriority: mapPriority(z.priorytet),
+                status: z.status,
+                assignedUserId: z.uzytkownik ? z.uzytkownik.uzytkownikId : "",
+                assignedUserName: z.uzytkownik ? `${z.uzytkownik.imie} ${z.uzytkownik.nazwisko}` : "Brak"
             })));
             setTotalPages(data.totalPages);
-        });
+        }).catch(err => console.error("Error fetching project tasks:", err));
+    };
+
+    useEffect(() => {
+        refreshTasks();
     }, [currentProject?.id, page, size, debouncedSearch]);
 
-    // progress (HIGH = done, bo na razie nie ma logiki done/undone)
+    // progress (based on DONE status)
     const progress = useMemo(() => {
         if (!tasks.length) return 0;
 
-        const done = tasks.filter((t) => t.priority === "HIGH").length;
+        const done = tasks.filter((t) => t.status === "DONE").length;
         return Math.round((done / tasks.length) * 100);
     }, [tasks]);
 
-    // zmiana priorytetu
-    const cyclePriority = async (taskId, currentPriority) => {
+    // zmiana statusu
+    const cycleStatus = async (taskId, currentStatus) => {
         const next =
-            currentPriority === "LOW"
-                ? "MEDIUM"
-                : currentPriority === "MEDIUM"
-                    ? "HIGH"
-                    : "LOW";
+            currentStatus === "TODO"
+                ? "IN_PROGRESS"
+                : currentStatus === "IN_PROGRESS"
+                    ? "DONE"
+                    : "TODO";
 
-        // update backend
-        await updateTaskPriorytet(taskId, next);
+        try {
+            // update backend
+            await updateTaskStatus(taskId, next);
 
-        // update UI
-        setTasks((prev) =>
-            prev.map((t) =>
-                t.id === taskId
-                    ? {
-                        ...t,
-                        priority: next,
-                        uiPriority: mapPriority(next),
-                    }
-                    : t
-            )
-        );
+            // update UI
+            setTasks((prev) =>
+                prev.map((t) =>
+                    t.id === taskId
+                        ? { ...t, status: next }
+                        : t
+                )
+            );
+        } catch (err) {
+            alert("Błąd podczas zmiany statusu zadania: " + err.message);
+        }
     };
 
     const handleStartEditDeadline = () => {
@@ -245,18 +323,24 @@ export default function ProjectDetails({ project, onBack }) {
                 )}
             </div>
 
+
             {/* TASK LIST */}
             <div className="subtasks-section">
                 <div className="tasks-header">
                     <h2>Tasks</h2>
-                    <div className="search-container">
-                        <input
-                            type="text"
-                            placeholder="Search tasks..."
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            className="search-input"
-                        />
+                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                        <button className="btn add-task" style={{ margin: 0 }} onClick={() => setIsAddTaskModalOpen(true)}>
+                            + Nowe zadanie
+                        </button>
+                        <div className="search-container">
+                            <input
+                                type="text"
+                                placeholder="Search tasks..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                className="search-input"
+                            />
+                        </div>
                     </div>
                 </div>
 
@@ -266,7 +350,7 @@ export default function ProjectDetails({ project, onBack }) {
                             key={task.id}
                             className={`task-item ${task.uiPriority}`}
                             onClick={() =>
-                                cyclePriority(task.id, task.priority)
+                                cycleStatus(task.id, task.status)
                             }
                         >
 
@@ -281,9 +365,42 @@ export default function ProjectDetails({ project, onBack }) {
                                 </div>
                             </div>
 
+                            {/* MIDDLE: User Assignment */}
+                            <div className="task-user-assignment" onClick={(e) => e.stopPropagation()}>
+                                <label style={{ fontSize: '11px', fontWeight: '600', color: '#6b6b6b', display: 'block', marginBottom: '4px' }}>
+                                    Przypisany:
+                                </label>
+                                <select
+                                    value={task.assignedUserId || ""}
+                                    onChange={(e) => handleAssignUserToTask(task.id, e.target.value)}
+                                    className="task-user-select"
+                                >
+                                    <option value="">Brak przypisania</option>
+                                    {allUsers.map(u => (
+                                        <option key={u.uzytkownikId} value={u.uzytkownikId}>
+                                            {u.imie} {u.nazwisko}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
                             {/* RIGHT */}
-                            <div className="task-priority">
-                                {task.priority}
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px', justifyContent: 'center' }}>
+                                <div style={{ 
+                                    fontSize: '11px', 
+                                    fontWeight: 'bold', 
+                                    padding: '3px 8px', 
+                                    borderRadius: '12px', 
+                                    textTransform: 'uppercase', 
+                                    background: getStatusBg(task.status), 
+                                    color: getStatusColor(task.status),
+                                    boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                                }}>
+                                    {mapStatusLabel(task.status)}
+                                </div>
+                                <div className="task-priority">
+                                    Prio: {task.priority}
+                                </div>
                             </div>
 
                         </div>
@@ -320,6 +437,13 @@ export default function ProjectDetails({ project, onBack }) {
                 )}
             </div>
 
+            <AddTaskModal
+                isOpen={isAddTaskModalOpen}
+                onClose={() => setIsAddTaskModalOpen(false)}
+                projectId={currentProject.id}
+                onTaskCreated={refreshTasks}
+                currentTaskCount={tasks.length}
+            />
         </div>
     );
 }
