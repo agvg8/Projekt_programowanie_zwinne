@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import {useState, useEffect} from "react";
 import "./styles.css";
 import "./index.css"
 import "./App.css"
@@ -12,176 +12,197 @@ import RegisterPage from "./pages/RegisterPage";
 import ProjectDetails from "./pages/ProjectDetails";
 import AdminPanel from "./pages/AdminPanel";
 import EditStudent from "./pages/EditStudent";
-import { fetchProjects } from "./api/projektApi";
+import {fetchProjects} from "./api/projektApi";
 import AddTaskPage from "./pages/AddTask/AddTask";
+import AddProject from "./pages/AddProject/AddProject";
 
 export default function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [authPage, setAuthPage] = useState("login");
-  const [currentPage, setCurrentPage] = useState("dashboard");
-  const [background, setBackground] = useState("/bg1.jpg");
-  const [selectedTask, setSelectedTask] = useState(null);
-  const [editedTask, setEditedTask] = useState(null);
-  const [projects, setProjects] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [page, setPage] = useState(0);
-  const [size, setSize] = useState(10);
-  const [totalPages, setTotalPages] = useState(1);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [authPage, setAuthPage] = useState("login");
+    const [currentPage, setCurrentPage] = useState("dashboard");
+    const [background, setBackground] = useState("/bg1.jpg");
+    const [selectedTask, setSelectedTask] = useState(null);
+    const [editedTask, setEditedTask] = useState(null);
+    const [projects, setProjects] = useState([]);
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [page, setPage] = useState(0);
+    const [size, setSize] = useState(10);
+    const [totalPages, setTotalPages] = useState(1);
+    const [editedProject, setEditedProject] = useState(null);
 
-  useEffect(() => {
-    document.body.style.backgroundImage = `url(${background})`;
-  }, [background]);
+    useEffect(() => {
+        document.body.style.backgroundImage = `url(${background})`;
+    }, [background]);
 
-  const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
+    const [search, setSearch] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-      setPage(0);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [search]);
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(search);
+            setPage(0);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [search]);
 
-  useEffect(() => {
-    fetchProjects(page, size, debouncedSearch).then(data => {
-      setProjects(data.projects);
-      setTotalPages(data.totalPages);
-    });
-  }, [page, size, debouncedSearch]);
+    const loadProjects = () => {
+        fetchProjects(page, size, debouncedSearch).then(data => {
+            setProjects(data.projects);
+            setTotalPages(data.totalPages);
+        });
+    };
 
-  const handleLogin = (username, password) => {
-    if (username === "admin" && password === "admin") {
-      setIsAuthenticated(true);
-      return { success: true };
-    }
+    useEffect(() => {
+        loadProjects();
+    }, [page, size, debouncedSearch]);
 
-    return { success: false, message: "Nieprawidlowy login lub haslo" };
-  };
+    const handleLogin = (username, password) => {
+        if (username === "admin" && password === "admin") {
+            setIsAuthenticated(true);
+            return {success: true};
+        }
 
-  if (!isAuthenticated) {
-    if (authPage === "register") {
-      return <RegisterPage onShowLogin={() => setAuthPage("login")} />;
+        return {success: false, message: "Nieprawidlowy login lub haslo"};
+    };
+
+    if (!isAuthenticated) {
+        if (authPage === "register") {
+            return <RegisterPage onShowLogin={() => setAuthPage("login")}/>;
+        }
+
+        return (
+            <LoginPage
+                onLogin={handleLogin}
+                onShowRegister={() => setAuthPage("register")}
+            />
+        );
     }
 
     return (
-      <LoginPage
-        onLogin={handleLogin}
-        onShowRegister={() => setAuthPage("register")}
-      />
-    );
-  }
+        <div
+            className="background"
+            //style={{ backgroundImage: `url(${background})` }}
+        >
 
-  return (
-    <div
-      className="background"
-      //style={{ backgroundImage: `url(${background})` }}
-    >
-
-      <div className="app-container">
-        <Sidebar
-            setCurrentPage={setCurrentPage}
-            setEditedTask={setEditedTask}
-        />
-
-
-        <main className="main-content">
-          <TopBar
-              setCurrentPage={setCurrentPage}
-              setEditedTask={setEditedTask}
-          />
-
-          {currentPage === "dashboard" && (
-            <>
-              <div className="dashboard-header">
-                <h1 className="title">My Projects</h1>
-                <div className="search-container">
-                  <input
-                    type="text"
-                    placeholder="Search projects..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="search-input"
-                  />
-                </div>
-              </div>
-              <TaskList
-                tasks={projects}
-                onTaskClick={(task) => {
-                setSelectedTask(task);
-                setCurrentPage("details");
-                }}
+            <div className="app-container">
+                <Sidebar
+                    setCurrentPage={setCurrentPage}
+                    setEditedTask={setEditedTask}
                 />
-              <div className="pagination">
-                <button
-                  onClick={() => setPage(p => Math.max(0, p - 1))}
-                  disabled={page === 0}
-                >
-                  Poprzednia
-                </button>
-                <span>Strona {page + 1} z {totalPages}</span>
-                <button
-                  onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
-                  disabled={page >= totalPages - 1}
-                >
-                  Następna
-                </button>
-                <select
-                  value={size}
-                  onChange={(e) => {
-                    setSize(Number(e.target.value));
-                    setPage(0);
-                  }}
-                >
-                  <option value={5}>5 na stronę</option>
-                  <option value={10}>10 na stronę</option>
-                  <option value={20}>20 na stronę</option>
-                </select>
-              </div>
-            </>
-          )}
-
-          {currentPage === "details" && selectedTask && (
-              <ProjectDetails
-                  project={selectedTask}
-                  onBack={() => setCurrentPage("dashboard")}
-                  setCurrentPage={setCurrentPage}
-                  setEditedTask={setEditedTask}
-              />
-           )}
-
-          {currentPage === "settings" && (
-            <Settings setBackground={setBackground} />
-          )}
-
-          {
-              currentPage === "admin" && (
-                  <AdminPanel
-                      setCurrentPage={setCurrentPage}
-                      setSelectedUser={setSelectedUser}
-                  />
-              )
-          }
-
-          {
-              currentPage === "editUser" && (
-                  <EditStudent
-                      user={selectedUser}
-                      setCurrentPage={setCurrentPage}
-                  />
-              )
-          }
-
-          {currentPage === "addTask" && (
-              <AddTaskPage
-                  task={editedTask}
-                  setCurrentPage={setCurrentPage}
-              />
-          )}
 
 
-        </main>
-      </div>
-    </div>
-  );
+                <main className="main-content">
+                    <TopBar
+                        setCurrentPage={setCurrentPage}
+                        setEditedTask={setEditedTask}
+                    />
+
+                    {currentPage === "dashboard" && (
+                        <>
+                            <div className="dashboard-header">
+                                <h1 className="title">
+                                    My Projects
+                                </h1>
+                                <button
+                                    className="btn add-task"
+                                    onClick={() => setCurrentPage("addProject")}
+                                >
+                                    + Nowy projekt
+                                </button>
+                                <div className="search-container">
+                                    <input
+                                        type="text"
+                                        placeholder="Search projects..."
+                                        value={search}
+                                        onChange={(e) => setSearch(e.target.value)}
+                                        className="search-input"
+                                    />
+                                </div>
+                            </div>
+                            <TaskList
+                                tasks={projects}
+                                onTaskClick={(task) => {
+                                    setSelectedTask(task);
+                                    setCurrentPage("details");
+                                }}
+                            />
+                            <div className="pagination">
+                                <button
+                                    onClick={() => setPage(p => Math.max(0, p - 1))}
+                                    disabled={page === 0}
+                                >
+                                    Poprzednia
+                                </button>
+                                <span>Strona {page + 1} z {totalPages}</span>
+                                <button
+                                    onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+                                    disabled={page >= totalPages - 1}
+                                >
+                                    Następna
+                                </button>
+                                <select
+                                    value={size}
+                                    onChange={(e) => {
+                                        setSize(Number(e.target.value));
+                                        setPage(0);
+                                    }}
+                                >
+                                    <option value={5}>5 na stronę</option>
+                                    <option value={10}>10 na stronę</option>
+                                    <option value={20}>20 na stronę</option>
+                                </select>
+                            </div>
+                        </>
+                    )}
+
+                    {currentPage === "details" && selectedTask && (
+                        <ProjectDetails
+                            project={selectedTask}
+                            onBack={() => setCurrentPage("dashboard")}
+                            setCurrentPage={setCurrentPage}
+                            setEditedTask={setEditedTask}
+                            refreshProjects={loadProjects}
+                            setSelectedTask={setSelectedTask}
+                        />
+                    )}
+
+                    {currentPage === "settings" && (
+                        <Settings setBackground={setBackground}/>
+                    )}
+
+                    {
+                        currentPage === "admin" && (
+                            <AdminPanel
+                                setCurrentPage={setCurrentPage}
+                                setSelectedUser={setSelectedUser}
+                            />
+                        )
+                    }
+
+                    {
+                        currentPage === "editUser" && (
+                            <EditStudent
+                                user={selectedUser}
+                                setCurrentPage={setCurrentPage}
+                            />
+                        )
+                    }
+
+                    {currentPage === "addTask" && (
+                        <AddTaskPage
+                            task={editedTask}
+                            setCurrentPage={setCurrentPage}
+                        />
+                    )}
+
+                    {currentPage === "addProject" && (
+                        <AddProject
+                            setCurrentPage={setCurrentPage}
+                            refreshProjects={loadProjects}
+                        />
+                    )}
+                </main>
+            </div>
+        </div>
+    );
 }

@@ -1,23 +1,75 @@
 import {useState, useMemo, useEffect} from "react";
-import { updateTaskStatus, deleteTask } from "../api/zadanieApi";
-import {fetchProjectTasks, updateProject} from "../api/projektApi.js";
-import { FaGoogle } from "react-icons/fa";
+import {updateTaskStatus, deleteTask} from "../api/zadanieApi";
+import {fetchProjectTasks, updateProject, deleteProject} from "../api/projektApi.js";
+import {FaGoogle} from "react-icons/fa";
 
 
 export default function ProjectDetails({
                                            project,
                                            onBack,
                                            setCurrentPage,
-                                           setEditedTask
+                                           setEditedTask,
+                                           refreshProjects,
+                                           setSelectedTask
                                        }) {
     const [currentProject, setCurrentProject] = useState(project);
     const [isEditingDeadline, setIsEditingDeadline] = useState(false);
     const [tempDeadline, setTempDeadline] = useState("");
+    const [isEditingProject, setIsEditingProject] = useState(false);
+
+    const [editedName, setEditedName] = useState("");
+    const [editedDescription, setEditedDescription] = useState("");
 
     useEffect(() => {
         setCurrentProject(project);
         setIsEditingDeadline(false);
     }, [project]);
+
+    const handleDeleteProject = async () => {
+        if (!window.confirm("Usunąć projekt?"))
+            return;
+        try {
+            await deleteProject(currentProject.id);
+            refreshProjects();
+            onBack();
+        } catch (err) {
+            alert(err.message);
+        }
+    };
+
+    const handleStartEditProject = () => {
+        setEditedName(currentProject.nazwa);
+        setEditedDescription(currentProject.opis || "");
+        setIsEditingProject(true);
+    };
+
+    const handleSaveProject = async () => {
+        try {
+            console.log(currentProject);
+            await updateProject({
+                projektId: currentProject.id,
+                nazwa: editedName,
+                opis: editedDescription,
+                dataOddania: currentProject.data_oddania
+            });
+
+            setCurrentProject(prev => ({
+                ...prev,
+                nazwa: editedName,
+                opis: editedDescription
+            }));
+            refreshProjects();
+            setIsEditingProject(false);
+            setSelectedTask(prev => ({
+                ...prev,
+                nazwa: editedName,
+                opis: editedDescription
+            }));
+        } catch (err) {
+            alert(err.message);
+        }
+
+    };
 
     const handleEditTask = (task, e) => {
         e.stopPropagation();
@@ -133,23 +185,33 @@ export default function ProjectDetails({
     };
 
     const handleStartEditDeadline = () => {
-        const rawDate = currentProject.data_oddania;
-        const formatted = rawDate ? rawDate.substring(0, 16) : "";
+        const rawDate = project.data_oddania;
+
+        const formatted = rawDate
+            ? rawDate.substring(0,16)
+            : new Date().toISOString().substring(0,16);
+
         setTempDeadline(formatted);
         setIsEditingDeadline(true);
     };
-
     const handleSaveDeadline = async () => {
+
         let formattedDeadline = null;
+
         if (tempDeadline) {
-            formattedDeadline = tempDeadline.length === 16 ? `${tempDeadline}:00` : tempDeadline;
+            formattedDeadline =
+                tempDeadline.length === 16
+                    ? `${tempDeadline}:00`
+                    : tempDeadline;
         }
+
+        console.log("WYSYŁAM:", formattedDeadline);
 
         try {
             await updateProject({
-                projektId: currentProject.id,
-                nazwa: currentProject.nazwa,
-                opis: currentProject.opis,
+                projektId: project.id,
+                nazwa: project.nazwa,
+                opis: project.opis,
                 dataOddania: formattedDeadline
             });
 
@@ -157,9 +219,11 @@ export default function ProjectDetails({
                 ...prev,
                 data_oddania: formattedDeadline
             }));
+
             setIsEditingDeadline(false);
+
         } catch (err) {
-            alert("Błąd podczas aktualizacji terminu projektu: " + err.message);
+            alert(err.message);
         }
     };
 
@@ -193,20 +257,79 @@ export default function ProjectDetails({
 
             {/* BACK BUTTON */}
             <div className="details-header">
-                <button className="back-btn" onClick={onBack}>
+
+                <button
+                    className="back-btn"
+                    onClick={onBack}
+                >
                     ← Back to dashboard
                 </button>
+
+                <button
+                    className="delete-project-btn"
+                    onClick={handleDeleteProject}
+                >
+                    🗑 Usuń projekt
+                </button>
+
             </div>
+            {isEditingProject ? (
 
-            {/* TITLE */}
-            <h1 className="details-title">
-                {currentProject.nazwa}
-            </h1>
+                <div>
 
-            {/* DESCRIPTION */}
-            <p className="project-desc">
-                {currentProject.opis}
-            </p>
+                    <input
+                        value={editedName}
+                        onChange={(e) => setEditedName(e.target.value)}
+                    />
+
+
+                    <textarea
+                        value={editedDescription}
+                        onChange={(e) => setEditedDescription(e.target.value)}
+                    />
+
+
+                    <button onClick={handleSaveProject}>
+                        Zapisz
+                    </button>
+
+
+                    <button
+                        onClick={() => setIsEditingProject(false)}
+                    >
+                        Anuluj
+                    </button>
+
+                </div>
+
+
+            ) : (
+
+                <>
+                    <div className="project-title-row">
+
+                        <h1 className="details-title">
+                            {currentProject.nazwa}
+                        </h1>
+
+
+                        <button
+                            onClick={handleStartEditProject}
+                        >
+                            ✏️
+                        </button>
+
+
+                    </div>
+
+
+                    <p className="project-desc">
+                        {currentProject.opis}
+                    </p>
+
+                </>
+
+            )}
 
             {/* PROGRESS */}
             <div className="progress-wrapper">
@@ -218,7 +341,7 @@ export default function ProjectDetails({
                 <div className="progress-bar">
                     <div
                         className="progress-fill"
-                        style={{ width: `${progress}%` }}
+                        style={{width: `${progress}%`}}
                     />
                 </div>
             </div>
@@ -230,7 +353,7 @@ export default function ProjectDetails({
                     <span>{currentProject.data_utworzenia ? new Date(currentProject.data_utworzenia).toLocaleDateString("pl-PL") : "Brak"}</span>
                 </div>
 
-                <div className="details-row" style={{ alignItems: "center" }}>
+                <div className="details-row" style={{alignItems: "center"}}>
                     <span className="label">Deadline:</span>
                     {isEditingDeadline ? (
                         <div className="deadline-edit-form">
@@ -242,7 +365,9 @@ export default function ProjectDetails({
                             />
                             <div className="deadline-edit-actions">
                                 <button className="btn-small save-btn" onClick={handleSaveDeadline}>Zapisz</button>
-                                <button className="btn-small cancel-btn" onClick={() => setIsEditingDeadline(false)}>Anuluj</button>
+                                <button className="btn-small cancel-btn"
+                                        onClick={() => setIsEditingDeadline(false)}>Anuluj
+                                </button>
                             </div>
                         </div>
                     ) : (
@@ -255,10 +380,11 @@ export default function ProjectDetails({
                                         day: "2-digit",
                                         hour: "2-digit",
                                         minute: "2-digit"
-                                      })
+                                    })
                                     : "Brak"}
                             </span>
-                            <button className="edit-deadline-btn" onClick={handleStartEditDeadline} title="Edytuj termin">
+                            <button className="edit-deadline-btn" onClick={handleStartEditDeadline}
+                                    title="Edytuj termin">
                                 ✏️
                             </button>
                         </div>
@@ -278,7 +404,7 @@ export default function ProjectDetails({
                             rel="noopener noreferrer"
                             className="google-calendar-btn"
                         >
-                            <FaGoogle className="google-icon" /> Dodaj do Kalendarza Google
+                            <FaGoogle className="google-icon"/> Dodaj do Kalendarza Google
                         </a>
                     </div>
                 )}
@@ -353,17 +479,17 @@ export default function ProjectDetails({
                             Poprzednia
                         </button>
                         <span>Strona {page + 1} z {totalPages}</span>
-                        <button 
-                            onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))} 
+                        <button
+                            onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
                             disabled={page >= totalPages - 1}
                         >
                             Następna
                         </button>
-                        <select 
-                            value={size} 
-                            onChange={(e) => { 
-                                setSize(Number(e.target.value)); 
-                                setPage(0); 
+                        <select
+                            value={size}
+                            onChange={(e) => {
+                                setSize(Number(e.target.value));
+                                setPage(0);
                             }}
                         >
                             <option value={5}>5 na stronę</option>

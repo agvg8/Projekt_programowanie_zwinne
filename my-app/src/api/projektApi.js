@@ -17,8 +17,9 @@ export async function fetchProjects(page = 0, size = 10, search = "") {
             id: p.projektId,
             nazwa: p.nazwa,
             opis: p.opis,
-            data_oddania: p.data_oddania,
-            data_utworzenia: p.data_utworzenia,
+            // obsługa obu wersji
+            data_oddania: p.dataOddania ?? p.data_oddania,
+            data_utworzenia: p.dataUtworzenia ?? p.data_utworzenia,
             zadania: p.zadania || []
         })),
         totalPages: data.totalPages
@@ -79,7 +80,7 @@ export async function downloadProjectAttachment(projectId, attachmentId) {
     const match = /filename="(.+)"/.exec(disposition);
     const filename = match ? match[1] : `zalacznik-${attachmentId}`;
 
-    return { blob, filename };
+    return {blob, filename};
 }
 
 export async function updateProject(projectDto) {
@@ -108,3 +109,31 @@ export async function getProjects() {
     return data.content;
 }
 
+export async function createProject(project) {
+
+    const res = await fetch(BASE_URL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            ...authHeaders()
+        },
+        body: JSON.stringify(project)
+    });
+
+
+    if (!res.ok) {
+        throw new Error("Nie udało się utworzyć projektu");
+    }
+
+}
+
+export async function deleteProject(projectId) {
+    const res = await fetch(`${BASE_URL}/${projectId}`, {
+        method: "DELETE",
+        headers: authHeaders()
+    });
+    if (!res.ok) {
+        throw new Error("Nie udało się usunąć projektu");
+    }
+
+}
