@@ -22,6 +22,8 @@ export default function ProjectDetails({
     const handleEditTask = (task, e) => {
         e.stopPropagation();
 
+        console.log(task);
+
         setEditedTask(task);
         setCurrentPage("addTask");
     };
@@ -55,6 +57,18 @@ export default function ProjectDetails({
         }
     };
 
+    const sortTasksByStatus = (tasks) => {
+        const order = {
+            IN_PROGRESS: 1,
+            TODO: 2,
+            DONE: 3
+        };
+
+        return [...tasks].sort(
+            (a, b) => order[a.status] - order[b.status]
+        );
+    };
+
     // lokalny stan (po sync z backendem)
     const [tasks, setTasks] = useState([]);
     const [page, setPage] = useState(0);
@@ -75,7 +89,7 @@ export default function ProjectDetails({
     useEffect(() => {
         if (!currentProject?.id) return;
         fetchProjectTasks(currentProject.id, page, size, debouncedSearch).then((data) => {
-            setTasks(data.tasks.map(z => ({
+            const mappedTasks = data.tasks.map(z => ({
                 id: z.zadanieId,
                 text: z.nazwa,
                 opis: z.opis,
@@ -83,7 +97,9 @@ export default function ProjectDetails({
                 status: z.status,
                 uiPriority: mapPriority(z.priorytet),
                 original: z
-            })));
+            }));
+
+            setTasks(sortTasksByStatus(mappedTasks));
             setTotalPages(data.totalPages);
         });
     }, [currentProject?.id, page, size, debouncedSearch]);
@@ -96,18 +112,22 @@ export default function ProjectDetails({
         return Math.round((done / tasks.length) * 100);
     }, [tasks]);
 
-    // zmiana priorytetu
     const markAsDone = async (taskId) => {
         await updateTaskStatus(taskId, "DONE");
-
         setTasks(prev =>
-            prev.map(task =>
-                task.id === taskId
-                    ? {
-                        ...task,
-                        status: "DONE",
-                    }
-                    : task
+            sortTasksByStatus(
+                prev.map(task =>
+                    task.id === taskId
+                        ? {
+                            ...task,
+                            status: "DONE",
+                            original: {
+                                ...task.original,
+                                status: "DONE"
+                            }
+                        }
+                        : task
+                )
             )
         );
     };
@@ -283,7 +303,7 @@ export default function ProjectDetails({
                     {tasks.map((task) => (
                         <div
                             key={task.id}
-                            className={`task-item ${task.uiPriority}`}
+                            className={`task-item ${task.uiPriority} ${task.status.toLowerCase()}`}
                             onClick={() => markAsDone(task.id)}
                         >
 

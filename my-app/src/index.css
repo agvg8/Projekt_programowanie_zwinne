@@ -143,3 +143,48 @@ body {
   background-position: center;
   background-repeat: no-repeat;
 }
+.task-item.todo {
+  border-left: 5px solid #f59e0b;
+}
+
+.task-item.in_progress {
+  border-left: 5px solid #3b82f6;
+}
+
+.task-item.done {
+  border-left: 5px solid #22c55e;
+  opacity: 0.75;
+}
+
+.task-item.done .task-title {
+  text-decoration: line-through;
+}
+.task-item.done {
+  background: #ececec;
+  opacity: .8;
+}
+
+.task-item.done .task-title {
+  text-decoration: line-through;
+}
+.task-status {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.task-status.todo {
+  background: #f59e0b;
+}
+
+.task-status.in_progress {
+  background: #3b82f6;
+}
+
+.task-status.done {
+  background: #22c55e;
+}

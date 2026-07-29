@@ -1,13 +1,18 @@
 import { FaUserCircle } from "react-icons/fa";
 
-export default function TopBar({ setCurrentPage }) {
-
+export default function TopBar({
+                                   setCurrentPage,
+                                   setEditedTask
+                               }) {
     return (
         <div className="top-bar">
 
             <button
                 className="btn add-task"
-                onClick={() => setCurrentPage("addTask")}
+                onClick={() => {
+                    setEditedTask(null);
+                    setCurrentPage("addTask");
+                }}
             >
                 + Add Task
             </button>

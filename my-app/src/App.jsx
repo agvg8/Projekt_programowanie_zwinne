@@ -79,11 +79,17 @@ export default function App() {
     >
 
       <div className="app-container">
-        <Sidebar setCurrentPage={setCurrentPage} />
+        <Sidebar
+            setCurrentPage={setCurrentPage}
+            setEditedTask={setEditedTask}
+        />
 
 
         <main className="main-content">
-          <TopBar setCurrentPage={setCurrentPage} />
+          <TopBar
+              setCurrentPage={setCurrentPage}
+              setEditedTask={setEditedTask}
+          />
 
           {currentPage === "dashboard" && (
             <>
