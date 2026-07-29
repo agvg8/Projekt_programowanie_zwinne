@@ -1,5 +1,5 @@
 import {useState, useMemo, useEffect} from "react";
-import { updateTaskPriorytet, deleteTask } from "../api/zadanieApi";
+import { updateTaskStatus, deleteTask } from "../api/zadanieApi";
 import {fetchProjectTasks, updateProject} from "../api/projektApi.js";
 import { FaGoogle } from "react-icons/fa";
 
@@ -10,7 +10,6 @@ export default function ProjectDetails({
                                            setCurrentPage,
                                            setEditedTask
                                        }) {
-    // lokalny stan projektu
     const [currentProject, setCurrentProject] = useState(project);
     const [isEditingDeadline, setIsEditingDeadline] = useState(false);
     const [tempDeadline, setTempDeadline] = useState("");
@@ -81,6 +80,7 @@ export default function ProjectDetails({
                 text: z.nazwa,
                 opis: z.opis,
                 priority: z.priorytet,
+                status: z.status,
                 uiPriority: mapPriority(z.priorytet),
                 original: z
             })));
@@ -92,32 +92,22 @@ export default function ProjectDetails({
     const progress = useMemo(() => {
         if (!tasks.length) return 0;
 
-        const done = tasks.filter((t) => t.priority === "HIGH").length;
+        const done = tasks.filter((t) => t.status === "DONE").length;
         return Math.round((done / tasks.length) * 100);
     }, [tasks]);
 
     // zmiana priorytetu
-    const cyclePriority = async (taskId, currentPriority) => {
-        const next =
-            currentPriority === "LOW"
-                ? "MEDIUM"
-                : currentPriority === "MEDIUM"
-                    ? "HIGH"
-                    : "LOW";
+    const markAsDone = async (taskId) => {
+        await updateTaskStatus(taskId, "DONE");
 
-        // update backend
-        await updateTaskPriorytet(taskId, next);
-
-        // update UI
-        setTasks((prev) =>
-            prev.map((t) =>
-                t.id === taskId
+        setTasks(prev =>
+            prev.map(task =>
+                task.id === taskId
                     ? {
-                        ...t,
-                        priority: next,
-                        uiPriority: mapPriority(next),
+                        ...task,
+                        status: "DONE",
                     }
-                    : t
+                    : task
             )
         );
     };
@@ -294,9 +284,7 @@ export default function ProjectDetails({
                         <div
                             key={task.id}
                             className={`task-item ${task.uiPriority}`}
-                            onClick={() =>
-                                cyclePriority(task.id, task.priority)
-                            }
+                            onClick={() => markAsDone(task.id)}
                         >
 
                             {/* LEFT */}
@@ -314,7 +302,7 @@ export default function ProjectDetails({
                             <div className="task-right">
 
                                 <div className="task-priority">
-                                    {task.priority}
+                                    {task.status}
                                 </div>
 
                                 <button

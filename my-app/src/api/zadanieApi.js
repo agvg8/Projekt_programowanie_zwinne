@@ -73,3 +73,15 @@ export async function deleteTask(zadanieId) {
         throw new Error("Nie udało się usunąć zadania");
     }
 }
+
+export async function updateTaskStatus(id, status) {
+    await fetch(
+        `${BASE_URL}/${id}/status?status=${status}`,
+        {
+            method: "PATCH",
+            headers: {
+                Authorization: `Bearer ${keycloak.token}`
+            }
+        }
+    );
+}

@@ -12,7 +12,6 @@ export async function fetchProjects(page = 0, size = 10, search = "") {
         headers: authHeaders()
     });
     const data = await res.json();
-    // console.log(data)
     return {
         projects: data.content.map((p) => ({
             id: p.projektId,
