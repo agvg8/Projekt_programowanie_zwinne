@@ -813,6 +813,7 @@ body, html {
 }
 
 .edit-form input,
+.edit-form textarea,
 .edit-form select {
   width: 100%;
   box-sizing: border-box;
@@ -835,6 +836,7 @@ body, html {
 }
 
 .edit-form input:focus,
+.edit-form textarea:focus,
 .edit-form select:focus {
   border-color: var(--primary);
   box-shadow: 0 0 0 4px rgba(152, 154, 53, 0.15);
@@ -857,6 +859,7 @@ body, html {
 }
 
 .edit-form input:hover,
+.edit-form textarea:hover,
 .edit-form select:hover {
   border-color: rgba(152, 154, 53, 0.4);
 }
@@ -1001,4 +1004,92 @@ h1, h2, .title {
 
 .task-action.delete{
   color:#ef4444;
+}
+
+.edit-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+
+  min-height: 120px;
+  resize: vertical;
+
+  padding: 12px 14px;
+  border-radius: 12px;
+
+  border: 1px solid rgba(0,0,0,0.08);
+  background: rgba(255,255,255,0.75);
+
+  color: var(--text-main);
+
+  font-family: var(--font-body);
+  font-size: 14px;
+
+  outline: none;
+  transition: all 0.2s ease;
+
+  backdrop-filter: blur(6px);
+}
+
+.delete-project-btn {
+  margin-left: 12px;
+
+  background: #f5bbb9;
+  color: #7a1f1f;
+
+  border: none;
+  padding: 10px 14px;
+
+  border-radius: 10px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+
+  box-shadow: 0 6px 15px rgba(245,187,185,0.25);
+}
+
+.delete-project-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(245,187,185,0.4);
+}
+
+.delete-project-btn:active {
+  transform: scale(0.98);
+}
+
+.edit-project-btn {
+  margin: 10px;
+
+  width: 38px;
+  height: 38px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 10px;
+
+  background: #989a35;
+  color: white;
+
+  font-size: 16px;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+
+  box-shadow: 0 6px 15px rgba(152,154,53,0.2);
+}
+
+.edit-project-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(152,154,53,0.35);
+}
+
+.edit-project-btn:active {
+  transform: scale(0.95);
 }

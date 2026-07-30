@@ -188,8 +188,8 @@ export default function ProjectDetails({
         const rawDate = project.data_oddania;
 
         const formatted = rawDate
-            ? rawDate.substring(0,16)
-            : new Date().toISOString().substring(0,16);
+            ? rawDate.substring(0, 16)
+            : new Date().toISOString().substring(0, 16);
 
         setTempDeadline(formatted);
         setIsEditingDeadline(true);
@@ -251,60 +251,58 @@ export default function ProjectDetails({
             return "#";
         }
     };
-
     return (
         <div className="project-details">
-
             {/* BACK BUTTON */}
             <div className="details-header">
-
                 <button
                     className="back-btn"
                     onClick={onBack}
                 >
                     ← Back to dashboard
                 </button>
-
                 <button
                     className="delete-project-btn"
                     onClick={handleDeleteProject}
                 >
                     🗑 Usuń projekt
                 </button>
-
             </div>
             {isEditingProject ? (
-
-                <div>
-
+                <div className="edit-form">
+                    <label>
+                        Project name
+                    </label>
                     <input
+                        type="text"
                         value={editedName}
                         onChange={(e) => setEditedName(e.target.value)}
+                        maxLength={50}
                     />
-
-
+                    <label>
+                        Description
+                    </label>
                     <textarea
                         value={editedDescription}
                         onChange={(e) => setEditedDescription(e.target.value)}
+                        maxLength={1000}
                     />
-
-
-                    <button onClick={handleSaveProject}>
-                        Zapisz
-                    </button>
-
-
-                    <button
-                        onClick={() => setIsEditingProject(false)}
-                    >
-                        Anuluj
-                    </button>
-
+                    <div className="edit-buttons">
+                        <button
+                            className="save-btn"
+                            onClick={handleSaveProject}
+                        >
+                            Zapisz
+                        </button>
+                        <button
+                            className="cancel-project-btn"
+                            onClick={() => setIsEditingProject(false)}
+                        >
+                            Anuluj
+                        </button>
+                    </div>
                 </div>
-
-
             ) : (
-
                 <>
                     <div className="project-title-row">
 
@@ -314,6 +312,7 @@ export default function ProjectDetails({
 
 
                         <button
+                            className="edit-project-btn"
                             onClick={handleStartEditProject}
                         >
                             ✏️
