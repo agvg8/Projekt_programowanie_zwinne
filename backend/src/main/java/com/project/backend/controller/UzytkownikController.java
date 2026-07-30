@@ -22,7 +22,17 @@ public class UzytkownikController {
     private final UzytkownikService uzytkownikService;
     Logger logger = Logger.getLogger("UzytkowniController");
 
-    @PatchMapping("/update")
+    @GetMapping
+    public ResponseEntity<Page<Uzytkownik>> getUzytkownicy(Pageable pageable) {
+        return ResponseEntity.ok(uzytkownikService.getUzytkownicy(pageable));
+    }
+
+    @GetMapping("/{uzytkownikId}")
+    public ResponseEntity<Uzytkownik> getUzytkownik(@PathVariable Integer uzytkownikId) {
+        return ResponseEntity.ok(uzytkownikService.getUzytkownik(uzytkownikId));
+    }
+
+  @PatchMapping("/update")
     public ResponseEntity<Void> updateUzytkownik(@Valid @RequestBody UzytkownikDto dto) {
         logger.info(dto.toString());
         authService.updateUser(dto);
@@ -40,3 +50,4 @@ public class UzytkownikController {
         return ResponseEntity.ok(uzytkownikService.getUzytkownicy(pageable));
     }
 }
+

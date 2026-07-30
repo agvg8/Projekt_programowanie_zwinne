@@ -36,4 +36,7 @@ public interface ZadanieService {
 
     Zadanie updateZadanie(ZadanieDto dto);
 
+    void przypiszUzytkownika(Integer zadanieId, Integer uzytkownikId);
+
+    void usunPrzypisanieUzytkownika(Integer zadanieId);
 }

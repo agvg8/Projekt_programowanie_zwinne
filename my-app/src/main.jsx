@@ -3,8 +3,13 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import keycloak from "./keycloak";
 
+const token = localStorage.getItem("kc_token");
+const refreshToken = localStorage.getItem("kc_refreshToken");
+
 keycloak.init({
-    onLoad: "login-required",
+    token: token || undefined,
+    refreshToken: refreshToken || undefined,
+    onLoad: "check-sso",
     checkLoginIframe: false
 }).then(() => {
 

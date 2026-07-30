@@ -1,24 +1,78 @@
 import { FaUserCircle } from "react-icons/fa";
 
+
 export default function TopBar({
-                                   setCurrentPage,
-                                   setEditedTask
-                               }) {
+    onLogout,
+    setCurrentPage,
+    setEditedTask
+}) {
+
     return (
+
         <div className="top-bar">
 
+
             <button
+
                 className="btn add-task"
+
                 onClick={() => {
-                    setEditedTask(null);
-                    setCurrentPage("addTask");
+
+                    if(setEditedTask){
+                        setEditedTask(null);
+                    }
+
+                    if(setCurrentPage){
+                        setCurrentPage("addTask");
+                    }
+
                 }}
+
             >
                 + Add Task
             </button>
 
-            <FaUserCircle className="profile-icon" />
+
+
+            <div
+
+                className="profile-container"
+
+                onClick={onLogout}
+
+                title="Kliknij, aby się wylogować"
+
+                style={{
+                    display:"flex",
+                    alignItems:"center",
+                    gap:"8px",
+                    cursor:"pointer"
+                }}
+
+            >
+
+                <FaUserCircle
+                    className="profile-icon"
+                />
+
+
+                <span
+
+                    style={{
+                        fontSize:"14px",
+                        fontWeight:"600"
+                    }}
+
+                >
+                    Wyloguj
+                </span>
+
+
+            </div>
+
 
         </div>
+
     );
+
 }

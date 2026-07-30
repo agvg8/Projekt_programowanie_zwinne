@@ -48,6 +48,11 @@ public class Zadanie {
     @JsonIgnoreProperties({"zadania"})
     private Projekt projekt;
 
+    @ManyToOne
+    @JoinColumn(name = "uzytkownik_id")
+    @JsonIgnoreProperties({"projekty", "zadania"})
+    private Uzytkownik uzytkownik;
+
     public Zadanie(String nazwa, String opis, Integer kolejnosc) {
         this.nazwa = nazwa;
         this.opis = opis;

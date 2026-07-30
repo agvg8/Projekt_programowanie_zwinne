@@ -2,86 +2,234 @@ import keycloak from "../keycloak.js";
 
 const BASE_URL = "http://localhost:8081/api/zadanie";
 
+
+const authHeaders = () => ({
+    Authorization: `Bearer ${keycloak.token}`
+});
+
+
+
 export async function fetchTasks() {
-    const res = await fetch(BASE_URL, {
-        headers: {
-            Authorization: `Bearer ${keycloak.token}`
+
+    const res = await fetch(
+        BASE_URL,
+        {
+            headers: authHeaders()
         }
-    });
+    );
+
     const data = await res.json();
-    console.log(data)
+
+    console.log(data);
+
     return data.content;
 }
 
+
+
+
+
 export async function updateTaskPriorytet(id, status) {
-    await fetch(
-        `http://localhost:8081/api/zadanie/${id}/priorytet?priorytet=${status}`,
+
+    const res = await fetch(
+        `${BASE_URL}/${id}/priorytet?priorytet=${status}`,
         {
-            method: "PATCH",
-            headers: {
-                Authorization: `Bearer ${keycloak.token}`
-            }
+            method:"PATCH",
+            headers:authHeaders()
         }
     );
+
+
+    if(!res.ok){
+        throw new Error(
+            "Nie udało się zmienić priorytetu zadania"
+        );
+    }
+
 }
+
+
+
+
 
 export async function createTask(task) {
-    const response = await fetch(BASE_URL, {
-        method: "POST",
-        headers: {
-            Authorization: `Bearer ${keycloak.token}`,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(task)
-    });
 
-
-    if (!response.ok) {
-        throw new Error("Nie udało się dodać zadania");
-    }
-
-    return true;
-}
-
-export async function updateTask(zadanieId, task) {
-    const response = await fetch(`${BASE_URL}/${zadanieId}`, {
-        method: "PUT",
-        headers: {
-            Authorization: `Bearer ${keycloak.token}`,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(task),
-    });
-
-    if (!response.ok) {
-        throw new Error("Nie udało się zaktualizować zadania");
-    }
-}
-
-export async function deleteTask(zadanieId) {
-    const response = await fetch(
-        `${BASE_URL}/${zadanieId}`,
+    const res = await fetch(
+        BASE_URL,
         {
-            method: "DELETE",
-            headers: {
-                Authorization: `Bearer ${keycloak.token}`
-            }
+            method:"POST",
+
+            headers:{
+                "Content-Type":"application/json",
+                ...authHeaders()
+            },
+
+            body:
+                JSON.stringify(task)
         }
     );
 
-    if (!response.ok) {
-        throw new Error("Nie udało się usunąć zadania");
+
+    if(!res.ok){
+
+        const errorText =
+            await res.text();
+
+        throw new Error(
+            errorText ||
+            "Nie udało się dodać zadania"
+        );
+
     }
+
 }
 
-export async function updateTaskStatus(id, status) {
-    await fetch(
-        `${BASE_URL}/${id}/status?status=${status}`,
-        {
-            method: "PATCH",
-            headers: {
-                Authorization: `Bearer ${keycloak.token}`
+
+
+
+
+export async function updateTask(
+    zadanieId,
+    task
+) {
+
+    const response =
+        await fetch(
+            `${BASE_URL}/${zadanieId}`,
+            {
+                method:"PUT",
+
+                headers:{
+                    "Content-Type":"application/json",
+                    ...authHeaders()
+                },
+
+                body:
+                    JSON.stringify(task)
             }
-        }
-    );
+        );
+
+
+    if(!response.ok){
+
+        throw new Error(
+            "Nie udało się zaktualizować zadania"
+        );
+
+    }
+
+}
+
+
+
+
+
+export async function deleteTask(
+    zadanieId
+) {
+
+    const response =
+        await fetch(
+            `${BASE_URL}/${zadanieId}`,
+            {
+                method:"DELETE",
+                headers:authHeaders()
+            }
+        );
+
+
+    if(!response.ok){
+
+        throw new Error(
+            "Nie udało się usunąć zadania"
+        );
+
+    }
+
+}
+
+
+
+
+
+export async function updateTaskStatus(
+    id,
+    status
+) {
+
+    const res =
+        await fetch(
+            `${BASE_URL}/${id}/status?status=${status}`,
+            {
+                method:"PATCH",
+                headers:authHeaders()
+            }
+        );
+
+
+    if(!res.ok){
+
+        throw new Error(
+            "Failed to update task status"
+        );
+
+    }
+
+}
+
+
+
+
+
+export async function assignUserToTask(
+    taskId,
+    userId
+) {
+
+    const res =
+        await fetch(
+            `${BASE_URL}/${taskId}/przypisz/uzytkownik/${userId}`,
+            {
+                method:"PATCH",
+                headers:authHeaders()
+            }
+        );
+
+
+    if(!res.ok){
+
+        throw new Error(
+            "Failed to assign user to task"
+        );
+
+    }
+
+}
+
+
+
+
+
+export async function removeUserFromTask(
+    taskId
+) {
+
+    const res =
+        await fetch(
+            `${BASE_URL}/${taskId}/usun/uzytkownik`,
+            {
+                method:"PATCH",
+                headers:authHeaders()
+            }
+        );
+
+
+    if(!res.ok){
+
+        throw new Error(
+            "Failed to remove user from task"
+        );
+
+    }
+
 }
