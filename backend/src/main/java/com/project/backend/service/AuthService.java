@@ -104,7 +104,6 @@ public class AuthService {
         UserRepresentation user = users.get(0);
 
         user.setEmail(dto.getEmail());
-        user.setUsername(dto.getImie() + "_" + dto.getNazwisko());
         user.setFirstName(dto.getImie());
         user.setLastName(dto.getNazwisko());
         usersResource.get(user.getId()).update(user);
