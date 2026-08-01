@@ -27,6 +27,9 @@ public class SecurityConfig {
                         // rejestracja - ALL (no auth)
                         .requestMatchers("/auth/register").permitAll()
 
+                        // handshake WebSocketu jest obsługiwany przez kanał rozmów
+                        .requestMatchers("/ws/**").permitAll()
+
                         // przypisywanie zadania do użytkownika
                         .requestMatchers(HttpMethod.PATCH,
                                 "/api/zadanie/*/przypisz/uzytkownik/*",

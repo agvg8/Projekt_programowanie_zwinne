@@ -10,6 +10,7 @@ import Settings from "./pages/Settings";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ProjectDetails from "./pages/ProjectDetails";
+import ChatPage from "./components/ChatPage";
 import { fetchProjects } from "./api/projektApi";
 import AddProjectModal from "./components/AddProjectModal";
 
@@ -123,7 +124,7 @@ export default function App({ keycloak }) {
     >
 
       <div className="app-container">
-        <Sidebar setCurrentPage={setCurrentPage} />
+        <Sidebar setCurrentPage={setCurrentPage} currentPage={currentPage} />
 
         <main className="main-content">
           <TopBar onLogout={handleLogout} />
@@ -193,6 +194,8 @@ export default function App({ keycloak }) {
           {currentPage === "settings" && (
             <Settings setBackground={setBackground} />
           )}
+
+          {currentPage === "chat" && <ChatPage />}
 
 
         </main>

@@ -1096,4 +1096,32 @@ body, html {
   cursor: not-allowed;
 }
 
+/* AgileSpace navigation refresh */
+.sidebar {
+  flex: 0 0 var(--sidebar-width);
+  min-height: 100vh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  padding: 26px 14px 18px;
+  border-right: 1px solid rgba(225, 220, 209, .8);
+  background: rgba(248, 246, 238, .82);
+}
+.sidebar-brand { display: flex; align-items: center; gap: 9px; padding: 0 8px 28px; }
+.brand-mark { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 9px; color: white; background: #989a35; font: 800 15px "Raleway", sans-serif; box-shadow: 0 5px 12px rgba(126, 128, 35, .2); }
+.sidebar-title { margin: 0; color: #4b5047; font: 800 16px "Raleway", sans-serif; letter-spacing: -.3px; }
+.sidebar-title span { color: #9b9d3c; }
+.nav-list { display: flex; flex-direction: column; gap: 4px; }
+.nav-item { display: flex; align-items: center; gap: 10px; margin: 0; padding: 11px 12px; color: #9b9d96; font-size: 12px; font-weight: 700; transition: .2s; }
+.nav-item svg { font-size: 16px; }
+.nav-item:hover, .nav-item.active { color: #73772d; background: #e9ebcb; }
+.nav-item.active { box-shadow: inset 3px 0 #989a35; }
+.nav-badge { min-width: 16px; height: 16px; display: grid; place-items: center; margin-left: auto; border-radius: 5px; color: #fff; background: #c7c987; font-size: 9px; }
+.sidebar-spacer { flex: 1; }
+.sidebar-tip { margin: 15px 3px 0; padding: 13px; border-radius: 12px; background: #f0d6d0; }
+.sidebar-tip span { color: #aa6c66; font-size: 8px; font-weight: 800; letter-spacing: 1px; }
+.sidebar-tip p { margin-top: 7px; color: #956a66; font-size: 10px; line-height: 1.45; }
+.main-content { min-width: 0; padding: 24px 28px 34px; }
+@media (max-width: 768px) { .sidebar { min-height: auto; flex: none; padding: 13px 14px; } .sidebar-brand { padding-bottom: 12px; } .sidebar-spacer, .sidebar-tip { display: none; } .nav-list { flex-direction: row; overflow-x: auto; } .nav-item { white-space: nowrap; } .main-content { padding: 18px 14px 25px; } }
+
 
