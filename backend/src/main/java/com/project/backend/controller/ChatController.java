@@ -42,7 +42,9 @@ public class ChatController {
     @PostMapping("/conversations")
     public ChatConversationResponse create(@Valid @RequestBody CreateChatConversationRequest request,
                                            Authentication authentication) {
-        return chatService.create(request, authentication);
+        ChatConversationResponse response = chatService.create(request, authentication);
+        chatWebSocketHandler.broadcastConversation(response);
+        return response;
     }
 
     @GetMapping("/conversations/{conversationId}/messages")

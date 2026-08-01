@@ -46,7 +46,8 @@ export const createChatConversation = (type, name, participantIds) =>
 export function connectToChatSocket(onMessage, onStatus) {
   const protocol = window.location.protocol === "https:" ? "wss" : "ws";
   const host = window.location.hostname === "localhost" ? "localhost:8081" : window.location.host;
-  const socket = new WebSocket(`${protocol}://${host}/ws/chat`);
+  const token = keycloak.token ? `?access_token=${encodeURIComponent(keycloak.token)}` : "";
+  const socket = new WebSocket(`${protocol}://${host}/ws/chat${token}`);
   const pendingSubscriptions = new Set();
   socket.onopen = () => {
     onStatus?.("online");
@@ -57,7 +58,7 @@ export function connectToChatSocket(onMessage, onStatus) {
   socket.onmessage = (event) => {
     try {
       const payload = JSON.parse(event.data);
-      if (payload.type === "message") onMessage?.(payload.payload);
+      if (payload.type === "message" || payload.type === "conversation") onMessage?.(payload);
     } catch {
       // Ignore malformed events from a disconnected or outdated server.
     }

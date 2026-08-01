@@ -1,4 +1,10 @@
 .chat-page { color: #29302f; max-width: 1480px; margin: 0 auto; }
+.chat-toast { position: fixed; z-index: 30; top: 22px; right: 26px; display: flex; align-items: center; gap: 10px; width: min(320px, calc(100vw - 42px)); padding: 12px 13px; border: 1px solid #e2e4bd; border-radius: 13px; background: #fffffb; box-shadow: 0 14px 32px rgba(68, 67, 38, .16); }
+.chat-toast-icon { width: 30px; height: 30px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 9px; color: #7d812c; background: #eff1d4; }
+.chat-toast strong, .chat-toast span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chat-toast strong { color: #565a50; font-size: 11px; }
+.chat-toast span { max-width: 220px; margin-top: 3px; color: #9b9c94; font-size: 10px; }
+.chat-toast .icon-button { margin-left: auto; flex: 0 0 auto; }
 .chat-page-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; margin: 8px 0 22px; }
 .chat-page-heading h1 { margin: 7px 0 5px; font-family: "Raleway", sans-serif; font-size: clamp(30px, 4vw, 42px); font-weight: 700; letter-spacing: -1.4px; color: #292e2d; }
 .chat-page-heading p { color: #8a8580; font-size: 14px; }

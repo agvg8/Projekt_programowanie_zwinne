@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -94,10 +95,14 @@ public class ChatService {
     @Transactional(readOnly = true)
     public List<ChatParticipantResponse> users(String search) {
         String normalized = search == null ? "" : search.trim().toLowerCase();
+        Set<String> identities = new HashSet<>();
         return userRepository.findAll().stream()
                 .filter(user -> normalized.isBlank()
                         || (user.getImie() + " " + user.getNazwisko()).toLowerCase().contains(normalized)
                         || (user.getEmail() != null && user.getEmail().toLowerCase().contains(normalized)))
+                .filter(user -> identities.add(user.getEmail() == null
+                        ? "id:" + user.getUzytkownikId()
+                        : "email:" + user.getEmail().trim().toLowerCase()))
                 .sorted(Comparator.comparing(Uzytkownik::getNazwisko).thenComparing(Uzytkownik::getImie))
                 .map(this::toParticipant)
                 .toList();

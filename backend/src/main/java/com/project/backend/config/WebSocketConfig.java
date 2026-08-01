@@ -11,10 +11,12 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketConfigurer {
     private final ChatWebSocketHandler chatWebSocketHandler;
+    private final ChatWebSocketHandshakeInterceptor chatWebSocketHandshakeInterceptor;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(chatWebSocketHandler, "/ws/chat")
+                .addInterceptors(chatWebSocketHandshakeInterceptor)
                 .setAllowedOrigins("http://localhost:5173");
     }
 }

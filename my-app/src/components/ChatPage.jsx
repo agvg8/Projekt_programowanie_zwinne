@@ -77,13 +77,22 @@ function formatDay(date) {
 }
 
 function normalizeConversation(item) {
-  const participants = (item.participants || []).map((person) => ({
+  const participants = Array.from(new Map((item.participants || []).map((person) => [person.email || String(person.id), {
     ...person,
     id: String(person.id),
     name: `${person.firstName} ${person.lastName}`
-  }));
+  }])).values());
   const other = participants.find((person) => person.id !== "you") || participants[0];
   return { ...item, id: String(item.id), participants, name: item.name || other?.name || "Nowa rozmowa", messages: [] };
+}
+
+function conversationKey(conversation) {
+  const members = conversation.participants.map((person) => person.email || String(person.id)).sort().join(",");
+  return `${conversation.type}:${conversation.type === "GROUP" ? conversation.name : "direct"}:${members}`;
+}
+
+function uniqueConversations(conversations) {
+  return Array.from(new Map(conversations.map((conversation) => [conversationKey(conversation), conversation])).values());
 }
 
 function Avatar({ person, large = false }) {
@@ -94,10 +103,17 @@ function NewConversationModal({ users, onClose, onCreate }) {
   const [type, setType] = useState("DIRECT");
   const [name, setName] = useState("");
   const [selected, setSelected] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const availableUsers = users.filter((user) => user.id !== "you");
 
   const toggleUser = (id) => setSelected((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
   const canCreate = type === "DIRECT" ? selected.length === 1 : selected.length > 0 && name.trim();
+  const submit = async () => {
+    if (!canCreate || isSubmitting) return;
+    setIsSubmitting(true);
+    await onCreate({ type, name, selected });
+    setIsSubmitting(false);
+  };
 
   return (
     <div className="chat-modal-overlay" onMouseDown={onClose}>
@@ -115,7 +131,7 @@ function NewConversationModal({ users, onClose, onCreate }) {
           <span className="chat-field-label">Wybierz osoby</span>
           {availableUsers.map((user) => <button key={user.id} className={`chat-member-option ${selected.includes(user.id) ? "selected" : ""}`} onClick={() => toggleUser(user.id)}><Avatar person={user} /><span><strong>{user.firstName} {user.lastName}</strong><small>{user.email}</small></span><span className="selection-check">{selected.includes(user.id) && <FiCheck />}</span></button>)}
         </div>
-        <div className="chat-modal-actions"><button className="chat-secondary-button" onClick={onClose}>Anuluj</button><button className="chat-primary-button" disabled={!canCreate} onClick={() => onCreate({ type, name, selected })}><FiPlus /> Utwórz rozmowę</button></div>
+        <div className="chat-modal-actions"><button className="chat-secondary-button" onClick={onClose} disabled={isSubmitting}>Anuluj</button><button className="chat-primary-button" disabled={!canCreate || isSubmitting} onClick={submit}><FiPlus /> {isSubmitting ? "Tworzenie..." : "Utwórz rozmowę"}</button></div>
       </div>
     </div>
   );
@@ -129,10 +145,27 @@ export default function ChatPage() {
   const [search, setSearch] = useState("");
   const [message, setMessage] = useState("");
   const [showNew, setShowNew] = useState(false);
+  const [toast, setToast] = useState(null);
   const [socketStatus, setSocketStatus] = useState("connecting");
   const [isMobileList, setIsMobileList] = useState(false);
   const messagesEndRef = useRef(null);
   const socketRef = useRef(null);
+  const activeIdRef = useRef(activeId);
+  const currentUserRef = useRef(currentUser);
+
+  useEffect(() => {
+    activeIdRef.current = activeId;
+  }, [activeId]);
+
+  useEffect(() => {
+    currentUserRef.current = currentUser;
+  }, [currentUser]);
+
+  useEffect(() => {
+    if (!toast) return undefined;
+    const timer = setTimeout(() => setToast(null), 4500);
+    return () => clearTimeout(timer);
+  }, [toast]);
 
   const activeConversation = conversations.find((conversation) => conversation.id === activeId) || conversations[0];
   const visibleConversations = useMemo(() => conversations.filter((conversation) => conversation.name.toLowerCase().includes(search.toLowerCase())), [conversations, search]);
@@ -142,20 +175,34 @@ export default function ChatPage() {
   useEffect(() => {
     fetchChatConversations().then((data) => {
       if (Array.isArray(data)) {
-        const normalized = data.map(normalizeConversation);
+        const normalized = uniqueConversations(data.map(normalizeConversation));
         setConversations(normalized);
         setActiveId(normalized[0]?.id || null);
       }
     }).catch(() => {});
     fetchCurrentChatUser().then((user) => setCurrentUser({ ...user, id: String(user.id), name: `${user.firstName} ${user.lastName}` })).catch(() => {});
-    fetchChatUsers().then((data) => { if (Array.isArray(data) && data.length) setUsers(data.map((user) => ({ ...user, id: String(user.id) }))); }).catch(() => {});
-    socketRef.current = connectToChatSocket((incoming) => {
+    fetchChatUsers().then((data) => { if (Array.isArray(data) && data.length) setUsers(Array.from(new Map(data.map((user) => [user.email || String(user.id), { ...user, id: String(user.id) }])).values())); }).catch(() => {});
+    socketRef.current = connectToChatSocket((event) => {
+      if (event.type === "conversation") {
+        const incomingConversation = { ...normalizeConversation(event.payload), messages: [], unread: 0 };
+        setConversations((items) => uniqueConversations(items.some((item) => item.id === incomingConversation.id)
+          ? items.map((item) => item.id === incomingConversation.id ? { ...item, ...incomingConversation } : item)
+          : [incomingConversation, ...items]));
+        return;
+      }
+
+      const incoming = event.payload;
       const next = { ...incoming, id: String(incoming.id), senderId: String(incoming.senderId), senderName: incoming.senderName };
       setConversations((items) => items.map((conversation) => {
         if (conversation.id !== String(incoming.conversationId)) return conversation;
         const hasMessage = conversation.messages.some((item) => String(item.id) === String(next.id));
-        return { ...conversation, messages: hasMessage ? conversation.messages.map((item) => String(item.id) === String(next.id) ? { ...item, ...next } : item) : [...conversation.messages, next] };
+        const isActive = conversation.id === activeIdRef.current;
+        const fromOtherUser = next.senderId !== String(currentUserRef.current.id);
+        return { ...conversation, unread: !isActive && fromOtherUser && !hasMessage ? (conversation.unread || 0) + 1 : conversation.unread, messages: hasMessage ? conversation.messages.map((item) => String(item.id) === String(next.id) ? { ...item, ...next } : item) : [...conversation.messages, next] };
       }));
+      if (next.senderId !== String(currentUserRef.current.id) && String(incoming.conversationId) !== activeIdRef.current) {
+        setToast({ title: next.senderName, text: next.deleted ? "Wiadomość usunięta" : next.content });
+      }
     }, setSocketStatus);
     return () => socketRef.current?.close();
   }, []);
@@ -202,11 +249,11 @@ export default function ChatPage() {
     try {
       const created = await createChatConversation(type, name, picked.map((user) => Number(user.id)));
       const normalized = { ...normalizeConversation(created), messages: [] };
-      setConversations((items) => [normalized, ...items]);
+      setConversations((items) => uniqueConversations([normalized, ...items]));
       setActiveId(normalized.id);
     } catch {
       const local = { id: `local-${Date.now()}`, type, name: type === "GROUP" ? name : picked[0]?.name || `${picked[0]?.firstName} ${picked[0]?.lastName}`, participants: [currentUser, ...picked], messages: [], unread: 0 };
-      setConversations((items) => [local, ...items]);
+      setConversations((items) => uniqueConversations([local, ...items]));
       setActiveId(local.id);
     }
     setShowNew(false);
@@ -214,6 +261,7 @@ export default function ChatPage() {
 
   return (
     <section className="chat-page">
+      {toast && <div className="chat-toast" role="status"><div className="chat-toast-icon"><FiMessageCircle /></div><div><strong>{toast.title}</strong><span>{toast.text}</span></div><button className="icon-button" onClick={() => setToast(null)} aria-label="Zamknij powiadomienie"><FiX /></button></div>}
       <div className="chat-page-heading"><div><span className="eyebrow">WORKSPACE / MESSAGES</span><h1>Twoje rozmowy</h1><p>Rozmawiaj z zespołem. Wszystko ważne, w jednym miejscu.</p></div><button className="chat-primary-button heading-action" onClick={() => setShowNew(true)}><FiEdit3 /> Nowa rozmowa</button></div>
       <div className={`chat-shell ${isMobileList ? "mobile-list-open" : ""}`}>
         <aside className="chat-conversation-list">
