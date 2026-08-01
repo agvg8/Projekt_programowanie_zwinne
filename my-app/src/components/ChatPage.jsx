@@ -150,6 +150,7 @@ export default function ChatPage() {
   const [isMobileList, setIsMobileList] = useState(false);
   const messagesEndRef = useRef(null);
   const socketRef = useRef(null);
+  const sendingMessageRef = useRef(false);
   const activeIdRef = useRef(activeId);
   const currentUserRef = useRef(currentUser);
 
@@ -226,13 +227,15 @@ export default function ChatPage() {
   const addMessage = async (event) => {
     event.preventDefault();
     const content = message.trim();
-    if (!content || !activeConversation) return;
+    if (!content || !activeConversation || sendingMessageRef.current) return;
     setMessage("");
     if (/^\d+$/.test(activeConversation.id)) {
+      sendingMessageRef.current = true;
       try {
         const sent = await sendChatMessage(activeConversation.id, content);
         setConversations((items) => items.map((conversation) => conversation.id === activeConversation.id && !conversation.messages.some((item) => String(item.id) === String(sent.id)) ? { ...conversation, messages: [...conversation.messages, sent] } : conversation));
       } catch { setMessage(content); }
+      finally { sendingMessageRef.current = false; }
       return;
     }
     const optimistic = { id: `local-${Date.now()}`, senderId: currentUser.id, senderName: `${currentUser.firstName} ${currentUser.lastName}`, content, sentAt: new Date().toISOString() };

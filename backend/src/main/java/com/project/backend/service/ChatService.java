@@ -36,7 +36,9 @@ public class ChatService {
     @Transactional(readOnly = true)
     public List<ChatConversationResponse> conversations(Authentication authentication) {
         Uzytkownik user = currentUser(authentication);
-        return conversationRepository.findAllForUser(user.getUzytkownikId()).stream().map(this::toConversation).toList();
+        return conversationRepository.findAllForUser(user.getUzytkownikId()).stream()
+                .map(conversation -> toConversation(conversation, user))
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -62,7 +64,7 @@ public class ChatService {
         conversation.setName(type == ChatConversationType.GROUP ? request.name() : null);
         conversation.setParticipants(participants);
         conversation.setUpdatedAt(Instant.now());
-        return toConversation(conversationRepository.save(conversation));
+        return toConversation(conversationRepository.save(conversation), current);
     }
 
     @Transactional
@@ -74,8 +76,8 @@ public class ChatService {
         message.setContent(request.content().trim());
         message.setSentAt(Instant.now());
         conversation.addMessage(message);
-        conversationRepository.save(conversation);
-        return toMessage(messageRepository.save(message));
+        messageRepository.save(message);
+        return toMessage(message);
     }
 
     @Transactional
@@ -145,12 +147,20 @@ public class ChatService {
         throw new IllegalStateException("Zalogowany użytkownik nie istnieje w bazie aplikacji");
     }
 
-    private ChatConversationResponse toConversation(ChatConversation conversation) {
+    private ChatConversationResponse toConversation(ChatConversation conversation, Uzytkownik viewer) {
         ChatMessageResponse last = conversation.getMessages().stream()
                 .max(Comparator.comparing(ChatMessage::getSentAt))
                 .map(this::toMessage)
                 .orElse(null);
-        return new ChatConversationResponse(conversation.getId(), conversation.getType().name(), conversation.getName(),
+        String name = conversation.getName();
+        if (conversation.getType() == ChatConversationType.DIRECT) {
+            name = conversation.getParticipants().stream()
+                    .filter(participant -> !participant.getUzytkownikId().equals(viewer.getUzytkownikId()))
+                    .map(participant -> participant.getImie() + " " + participant.getNazwisko())
+                    .findFirst()
+                    .orElse("Rozmowa prywatna");
+        }
+        return new ChatConversationResponse(conversation.getId(), conversation.getType().name(), name,
                 conversation.getParticipants().stream().map(this::toParticipant).toList(), last, conversation.getUpdatedAt());
     }
 
