@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -102,6 +103,11 @@ public class ChatService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public ChatParticipantResponse me(Authentication authentication) {
+        return toParticipant(currentUser(authentication));
+    }
+
     private ChatConversation conversation(Long id, Uzytkownik current) {
         ChatConversation conversation = conversationRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono rozmowy"));
@@ -113,15 +119,25 @@ public class ChatService {
 
     private Uzytkownik currentUser(Authentication authentication) {
         String email = null;
+        String username = null;
         if (authentication instanceof JwtAuthenticationToken jwtAuthentication) {
             email = jwtAuthentication.getToken().getClaimAsString("email");
+            username = jwtAuthentication.getToken().getClaimAsString("preferred_username");
         }
         if (email == null) {
             email = authentication.getName();
         }
         final String identity = email;
-        return userRepository.findByEmailIgnoreCase(identity)
-                .orElseThrow(() -> new IllegalStateException("Zalogowany użytkownik nie istnieje w bazie aplikacji"));
+        Optional<Uzytkownik> byEmail = userRepository.findByEmailIgnoreCase(identity);
+        if (byEmail.isPresent()) return byEmail.get();
+
+        if (username != null && username.contains("_")) {
+            String[] nameParts = username.split("_", 2);
+            Optional<Uzytkownik> byUsername = userRepository.findByImieIgnoreCaseAndNazwiskoIgnoreCase(nameParts[0], nameParts[1]);
+            if (byUsername.isPresent()) return byUsername.get();
+        }
+
+        throw new IllegalStateException("Zalogowany użytkownik nie istnieje w bazie aplikacji");
     }
 
     private ChatConversationResponse toConversation(ChatConversation conversation) {

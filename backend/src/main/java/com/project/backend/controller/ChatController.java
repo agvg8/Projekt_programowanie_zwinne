@@ -34,6 +34,11 @@ public class ChatController {
         return chatService.conversations(authentication);
     }
 
+    @GetMapping("/me")
+    public ChatParticipantResponse me(Authentication authentication) {
+        return chatService.me(authentication);
+    }
+
     @PostMapping("/conversations")
     public ChatConversationResponse create(@Valid @RequestBody CreateChatConversationRequest request,
                                            Authentication authentication) {

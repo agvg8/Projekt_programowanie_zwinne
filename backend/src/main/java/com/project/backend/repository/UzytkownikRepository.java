@@ -11,4 +11,6 @@ public interface UzytkownikRepository extends JpaRepository<Uzytkownik, Integer>
     Page<Uzytkownik> findByNazwiskoStartsWithIgnoreCase(String nazwisko, Pageable pageable);
 
     Optional<Uzytkownik> findByEmailIgnoreCase(String email);
+
+    Optional<Uzytkownik> findByImieIgnoreCaseAndNazwiskoIgnoreCase(String imie, String nazwisko);
 }

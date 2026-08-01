@@ -9,6 +9,7 @@ import {
   createChatConversation,
   deleteChatMessage,
   fetchChatConversations,
+  fetchCurrentChatUser,
   fetchChatMessages,
   fetchChatUsers,
   sendChatMessage
@@ -124,6 +125,7 @@ export default function ChatPage() {
   const [conversations, setConversations] = useState(demoConversations);
   const [users, setUsers] = useState(demoUsers);
   const [activeId, setActiveId] = useState("maya");
+  const [currentUser, setCurrentUser] = useState(demoUsers[0]);
   const [search, setSearch] = useState("");
   const [message, setMessage] = useState("");
   const [showNew, setShowNew] = useState(false);
@@ -133,19 +135,19 @@ export default function ChatPage() {
   const socketRef = useRef(null);
 
   const activeConversation = conversations.find((conversation) => conversation.id === activeId) || conversations[0];
-  const currentUser = demoUsers[0];
   const visibleConversations = useMemo(() => conversations.filter((conversation) => conversation.name.toLowerCase().includes(search.toLowerCase())), [conversations, search]);
   const activePerson = activeConversation?.participants.find((person) => person.id !== "you") || activeConversation?.participants[0];
   const activeConversationId = activeConversation?.id;
 
   useEffect(() => {
     fetchChatConversations().then((data) => {
-      if (Array.isArray(data) && data.length) {
+      if (Array.isArray(data)) {
         const normalized = data.map(normalizeConversation);
         setConversations(normalized);
-        setActiveId(normalized[0].id);
+        setActiveId(normalized[0]?.id || null);
       }
     }).catch(() => {});
+    fetchCurrentChatUser().then((user) => setCurrentUser({ ...user, id: String(user.id), name: `${user.firstName} ${user.lastName}` })).catch(() => {});
     fetchChatUsers().then((data) => { if (Array.isArray(data) && data.length) setUsers(data.map((user) => ({ ...user, id: String(user.id) }))); }).catch(() => {});
     socketRef.current = connectToChatSocket((incoming) => {
       const next = { ...incoming, id: String(incoming.id), senderId: String(incoming.senderId), senderName: incoming.senderName };
@@ -226,6 +228,7 @@ export default function ChatPage() {
           <div className="chat-list-footer"><div className="chat-status"><span className={socketStatus === "online" ? "live-dot" : "live-dot muted"} /><span>{socketStatus === "online" ? "Połączenie live" : "Tryb lokalny"}</span><FiWifi /></div></div>
         </aside>
         <main className="chat-thread">
+          {!activeConversation && <div className="chat-empty-state"><div className="chat-empty-icon"><FiMessageCircle /></div><h2>Wybierz rozmowę</h2><p>Nie masz jeszcze żadnych rozmów. Rozpocznij nową, aby napisać do osoby z systemu.</p><button className="chat-primary-button" onClick={() => setShowNew(true)}><FiEdit3 /> Nowa rozmowa</button></div>}
           {activeConversation && <>
             <header className="chat-thread-header"><button className="icon-button mobile-back" onClick={() => setIsMobileList(true)}><FiArrowLeft /></button><div className="chat-thread-identity">{activeConversation.type === "GROUP" ? <div className="chat-avatar group-avatar"><FiUsers /></div> : <Avatar person={activePerson} large />}<div><h2>{activeConversation.name}</h2><span>{activeConversation.type === "GROUP" ? `${activeConversation.participants.length} osoby · aktywna grupa` : <><i className="online-dot-inline" /> {activePerson?.online ? "Aktywny teraz" : "Ostatnio online niedawno"}</>}</span></div></div><div className="chat-thread-actions"><button className="icon-button soft"><FiSearch /></button><button className="icon-button soft"><FiMoreHorizontal /></button></div></header>
             <div className="chat-thread-body">{activeConversation.messages.map((item, index) => { const day = formatDay(item.sentAt); const previousDay = index > 0 ? formatDay(activeConversation.messages[index - 1].sentAt) : null; const showDay = day !== previousDay; const own = item.senderId === "you" || item.senderId === currentUser.id; return <div key={item.id}>{showDay && <div className="chat-date-divider"><span>{day}</span></div>}<div className={`chat-message-row ${own ? "own" : ""}`}>{!own && <Avatar person={activeConversation.participants.find((person) => person.id === item.senderId) || { firstName: item.senderName?.split(" ")[0], lastName: item.senderName?.split(" ")[1] }} />}<div className="chat-message-stack"><span className="chat-message-author">{own ? "Ty" : item.senderName}</span><div className={`chat-bubble ${item.deleted ? "deleted" : ""}`}><span>{item.deleted ? "Wiadomość usunięta" : item.content}</span>{own && !item.deleted && <button className="message-delete" onClick={() => deleteMessage(item)} title="Usuń wiadomość"><FiTrash2 /></button>}</div><span className="chat-message-time">{formatTime(item.sentAt)} {own && !item.deleted && <FiCheck />}</span></div></div></div>; })}<div ref={messagesEndRef} /></div>

@@ -20,6 +20,8 @@ async function request(path, options = {}) {
 
 export const fetchChatConversations = () => request("/conversations");
 
+export const fetchCurrentChatUser = () => request("/me");
+
 export const fetchChatMessages = (conversationId) =>
   request(`/conversations/${conversationId}/messages`);
 
