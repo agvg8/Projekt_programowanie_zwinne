@@ -655,12 +655,8 @@ export default function ProjectDetails({
 
 
 
-    const handleSaveProject = async()=>{
-
-
-        try{
-
-
+    const handleSaveProject = async () => {
+        try {
             await updateProject({
 
                 projektId:
@@ -849,13 +845,7 @@ export default function ProjectDetails({
                 tempDeadline;
 
         }
-
-
-
-
-        try{
-
-
+        try {
             await updateProject({
 
                 projektId:
@@ -1804,4 +1794,4 @@ tasks.length
 );
 
 }
-  
+

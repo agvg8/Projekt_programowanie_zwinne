@@ -1,5 +1,4 @@
 export default function TaskItem({ task, onClick }) {
-  console.log("PROJEKT W LISTACH:", task);
   return (
     <div
       className="task-item"
