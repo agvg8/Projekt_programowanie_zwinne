@@ -29,7 +29,7 @@ export default function TopBar({
                 }}
 
             >
-                + Add Task
+                + Nowe zadanie
             </button>
 
 

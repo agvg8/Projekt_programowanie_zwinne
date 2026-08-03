@@ -946,37 +946,6 @@ h2 {
 }
 
 
-
-.edit-deadline-btn {
-
-  background:none;
-
-  border:none;
-
-  cursor:pointer;
-
-  font-size:
-    14px;
-
-  padding:
-    4px;
-
-  border-radius:
-    6px;
-
-  transition:.2s;
-}
-
-
-
-.edit-deadline-btn:hover {
-
-  background:
-    rgba(0,0,0,.06);
-}
-
-
-
 .deadline-edit-form {
 
   display:flex;
@@ -1400,7 +1369,8 @@ h2 {
 
 
 
-.edit-project-btn {
+.edit-project-btn,
+.edit-deadline-btn{
 
   margin:
     10px;
@@ -1434,7 +1404,8 @@ h2 {
 
 
 
-.edit-project-btn:hover {
+.edit-project-btn:hover,
+.edit-deadline-btn:hover {
 
   transform:
     translateY(-2px);

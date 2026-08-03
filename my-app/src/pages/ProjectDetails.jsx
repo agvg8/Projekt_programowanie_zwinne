@@ -31,7 +31,7 @@ const mapStatusLabel = (status) => {
             return "TODO";
 
         case "IN_PROGRESS":
-            return "WIP";
+            return "IN PROGRESS";
 
         case "DONE":
             return "DONE";
@@ -49,10 +49,10 @@ const getStatusBg = (status)=>{
     switch(status){
 
         case "TODO":
-            return "#e2e8f0";
+            return "#eddbbe";
 
         case "IN_PROGRESS":
-            return "#feebc8";
+            return "#b3c9f3";
 
         case "DONE":
             return "#c6f6d5";
@@ -71,10 +71,10 @@ const getStatusColor = (status)=>{
     switch(status){
 
         case "TODO":
-            return "#4a5568";
+            return "#dd7744";
 
         case "IN_PROGRESS":
-            return "#c05621";
+            return "#3b82f6";
 
         case "DONE":
             return "#22543d";
@@ -1253,83 +1253,69 @@ isEditingDeadline
 ?
 
 
-<div>
+    <div className="deadline-edit-form">
+        <input
+            className="deadline-input"
+            type="datetime-local"
+            value={tempDeadline}
+            onChange={(e) => setTempDeadline(e.target.value)}
+        />
+
+        <div className="deadline-edit-actions">
+            <button
+                className="deadline-save-btn"
+                onClick={handleSaveDeadline}
+            >
+                Zapisz
+            </button>
+
+            <button
+                className="deadline-cancel-btn"
+                onClick={() => setIsEditingDeadline(false)}
+            >
+                Anuluj
+            </button>
+        </div>
+    </div>
 
 
-<input
-
-type="datetime-local"
-
-value={tempDeadline}
-
-onChange={
-e=>setTempDeadline(e.target.value)
-}
-
-/>
+    :
 
 
-<button
-
-onClick={handleSaveDeadline}
-
->
-Zapisz
-</button>
-
-
-<button
-
-onClick={()=>
-setIsEditingDeadline(false)
-}
-
->
-Anuluj
-</button>
-
-
-</div>
-
-
-
-:
-
-
-<div>
+    <div>
 
 
 <span>
 
 {
-currentProject.data_oddania
+    currentProject.data_oddania
 
-?
+        ?
 
-new Date(
-currentProject.data_oddania
-)
-.toLocaleString("pl-PL")
+        new Date(
+            currentProject.data_oddania
+        )
+            .toLocaleString("pl-PL")
 
-:
+        :
 
-"Brak"
+        "Brak"
 
 }
 
 </span>
 
 
-<button
+        <button
+            className="edit-deadline-btn"
+            onClick={handleStartEditDeadline}
 
-onClick={handleStartEditDeadline}
-
->
-✏️
-</button>
+        >
+            ✏️
+        </button>
 
 
-</div>
+    </div>
 
 
 }
@@ -1338,66 +1324,53 @@ onClick={handleStartEditDeadline}
 </div>
 
 
-
-
-<div className="details-row">
+    <div className="details-row">
 
 <span className="label">
 Tasks:
 </span>
 
 
-<span>
+        <span>
 {tasks.length}
 </span>
 
 
-</div>
+    </div>
 
 
+    {
+        currentProject.data_oddania &&
 
 
+        <a
 
-{
-currentProject.data_oddania &&
+            className="google-calendar-btn"
 
+            href={
+                getGoogleCalendarUrl(currentProject)
+            }
 
-<a
+            target="_blank"
 
-className="google-calendar-btn"
+            rel="noopener noreferrer"
 
-href={
-getGoogleCalendarUrl(currentProject)
-}
+        >
 
-target="_blank"
+            <FaGoogle/>
 
-rel="noopener noreferrer"
-
->
-
-<FaGoogle/>
-
-Dodaj do Kalendarza Google
+            Dodaj do Kalendarza Google
 
 
-</a>
+        </a>
 
-}
-
-
+    }
 
 
 </div>
 
 
-
-
-
-
-
-
-<div className="subtasks-section">
+    <div className="subtasks-section">
 
 
 <div className="tasks-header">
@@ -1497,102 +1470,81 @@ task.status
 </div>
 
 
+    <div
+
+        className="task-user-assignment"
+
+        onClick={
+            e => e.stopPropagation()
+        }
+
+    >
 
 
+        <label>
+            Przypisany:
+        </label>
 
 
-
-<div
-
-className="task-user-assignment"
-
-onClick={
-e=>e.stopPropagation()
-}
-
->
+        <select
+            className="task-user-select"
+            value={task.assignedUserId || ""}
+            onChange={(e) =>
+                handleAssignUserToTask(task.id, e.target.value)
+            }
+        >
 
 
-<label>
-Przypisany:
-</label>
+            <option value="">
+                Brak przypisania
+            </option>
 
 
+            {
 
-<select
-
-value={
-task.assignedUserId || ""
-}
-
-onChange={
-e=>
-handleAssignUserToTask(
-task.id,
-e.target.value
-)
-}
-
->
+                allUsers.map(u => (
 
 
-<option value="">
-Brak przypisania
-</option>
+                    <option
+
+                        key={u.uzytkownikId}
+
+                        value={u.uzytkownikId}
+
+                    >
+
+                        {u.imie} {u.nazwisko}
+
+                    </option>
 
 
+                ))
 
-{
-
-allUsers.map(u=>(
-
-
-<option
-
-key={u.uzytkownikId}
-
-value={u.uzytkownikId}
-
->
-
-{u.imie} {u.nazwisko}
-
-</option>
+            }
 
 
-))
-
-}
+        </select>
 
 
-</select>
+    </div>
 
 
-
-</div>
-
+    <div className="task-right">
 
 
+        <div
 
+            className="task-status-badge"
 
+            style={{
 
+                background: getStatusBg(task.status),
 
-<div className="task-right">
+                color: getStatusColor(task.status)
 
+            }}
 
-<div
-
-className="task-status-badge"
-
-style={{
-
-background:getStatusBg(task.status),
-
-color:getStatusColor(task.status)
-
-}}
-
->
+        >
 
 {mapStatusLabel(task.status)}
 
