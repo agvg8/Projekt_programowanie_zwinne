@@ -44,10 +44,5 @@ public class UzytkownikController {
         authService.deleteUser(userId);
         return ResponseEntity.ok().build();
     }
-
-    @GetMapping
-    public ResponseEntity<Page<Uzytkownik>> getUsers(Pageable pageable) {
-        return ResponseEntity.ok(uzytkownikService.getUzytkownicy(pageable));
-    }
 }
 
