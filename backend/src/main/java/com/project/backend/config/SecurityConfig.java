@@ -28,7 +28,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/register").permitAll()
 
                         // handshake WebSocketu jest obsługiwany przez kanał rozmów
-                        .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/ws/**").hasAnyRole("USER", "MANAGER", "ADMIN")
 
                         // przypisywanie zadania do użytkownika
                         .requestMatchers(HttpMethod.PATCH,
