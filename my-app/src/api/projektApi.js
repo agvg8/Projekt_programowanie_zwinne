@@ -2,9 +2,12 @@ import keycloak from "../keycloak.js";
 
 const BASE_URL = "http://localhost:8081/api/projekt";
 
-const authHeaders = () => ({
-    Authorization: `Bearer ${keycloak.token}`
-});
+const authHeaders = async () => {
+    await keycloak.updateToken(30);
+    return {
+        Authorization: `Bearer ${keycloak.token}`
+    };
+};
 
 
 export async function fetchProjects(page = 0, size = 10, search = "") {
@@ -16,7 +19,7 @@ export async function fetchProjects(page = 0, size = 10, search = "") {
     const res = await fetch(
         `${BASE_URL}?page=${page}&size=${size}${query}`,
         {
-            headers: authHeaders()
+            headers: await authHeaders()
         }
     );
 
@@ -52,7 +55,7 @@ export async function fetchProject(projectId) {
     const res = await fetch(
         `${BASE_URL}/${projectId}`,
         {
-            headers: authHeaders()
+            headers: await authHeaders()
         }
     );
 
@@ -113,7 +116,7 @@ export async function fetchProjectTasks(
     const res = await fetch(
         `${BASE_URL}/${projectId}/zadania?page=${page}&size=${size}${query}`,
         {
-            headers: authHeaders()
+            headers: await authHeaders()
         }
     );
 
@@ -136,7 +139,7 @@ export async function fetchProjectAttachments(projectId) {
     const res = await fetch(
         `${BASE_URL}/${projectId}/zalaczniki`,
         {
-            headers: authHeaders()
+            headers: await authHeaders()
         }
     );
 
@@ -161,7 +164,7 @@ export async function uploadProjectAttachment(projectId,file) {
         `${BASE_URL}/${projectId}/zalaczniki`,
         {
             method:"POST",
-            headers:authHeaders(),
+            headers: await authHeaders(),
             body:formData
         }
     );
@@ -187,7 +190,7 @@ export async function downloadProjectAttachment(
     const res = await fetch(
         `${BASE_URL}/${projectId}/zalaczniki/${attachmentId}`,
         {
-            headers:authHeaders()
+            headers: await authHeaders()
         }
     );
 
@@ -233,9 +236,9 @@ export async function updateProject(projectDto) {
         {
             method:"PATCH",
 
-            headers:{
+            headers: {
                 "Content-Type":"application/json",
-                ...authHeaders()
+                ...await authHeaders()
             },
 
             body:
@@ -262,7 +265,7 @@ export async function getProjects() {
         await fetch(
             BASE_URL,
             {
-                headers:authHeaders()
+                headers: await authHeaders()
             }
         );
 
@@ -296,7 +299,7 @@ export async function createProject(project) {
 
             headers:{
                 "Content-Type":"application/json",
-                ...authHeaders()
+                ...await authHeaders()
             },
 
             body:
@@ -329,7 +332,7 @@ export async function deleteProject(projectId) {
         `${BASE_URL}/${projectId}`,
         {
             method:"DELETE",
-            headers:authHeaders()
+            headers:await authHeaders()
         }
     );
 
@@ -357,7 +360,7 @@ export async function assignUserToProject(
         `${BASE_URL}/${projectId}/przypisz/uzytkownik/${userId}`,
         {
             method:"PATCH",
-            headers:authHeaders()
+            headers:await authHeaders()
         }
     );
 
@@ -385,7 +388,7 @@ export async function removeUserFromProject(
         `${BASE_URL}/${projectId}/usun/uzytkownik/${userId}`,
         {
             method:"PATCH",
-            headers:authHeaders()
+            headers:await authHeaders()
         }
     );
 

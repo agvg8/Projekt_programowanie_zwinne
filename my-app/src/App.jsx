@@ -21,8 +21,9 @@ import AddProject from "./pages/AddProject/AddProject";
 import {fetchProjects} from "./api/projektApi";
 import AddProjectModal from "./components/AddProjectModal";
 
+import keycloak from "./keycloak.js";
 
-export default function App({keycloak}) {
+export default function App() {
 
     const [isAuthenticated, setIsAuthenticated] =
         useState(keycloak?.authenticated || false);
@@ -63,24 +64,24 @@ export default function App({keycloak}) {
         const timer = setTimeout(() => {
             setDebouncedSearch(search);
             setPage(0);
-        },300);
+        }, 300);
 
         return () => clearTimeout(timer);
 
-    },[search]);
+    }, [search]);
 
 
     const loadProjects = () => {
 
-        if(!isAuthenticated)
+        if (!isAuthenticated)
             return;
 
-        fetchProjects(page,size,debouncedSearch)
-            .then(data=>{
+        fetchProjects(page, size, debouncedSearch)
+            .then(data => {
                 setProjects(data.projects);
                 setTotalPages(data.totalPages);
             })
-            .catch(err=>{
+            .catch(err => {
                 console.error(
                     "Error fetching projects:",
                     err
@@ -89,9 +90,9 @@ export default function App({keycloak}) {
     };
 
 
-    useEffect(()=>{
+    useEffect(() => {
         loadProjects();
-    },[
+    }, [
         page,
         size,
         debouncedSearch,
@@ -99,37 +100,36 @@ export default function App({keycloak}) {
     ]);
 
 
+    const handleLogin = async (username, password) => {
 
-    const handleLogin = async(username,password)=>{
-
-        try{
+        try {
 
             const response =
                 await fetch(
-                "http://localhost:8080/realms/programowanie-zwinne/protocol/openid-connect/token",
-                {
-                    method:"POST",
-                    headers:{
-                        "Content-Type":
-                        "application/x-www-form-urlencoded"
-                    },
-                    body:new URLSearchParams({
+                    "http://localhost:8080/realms/programowanie-zwinne/protocol/openid-connect/token",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type":
+                                "application/x-www-form-urlencoded"
+                        },
+                        body: new URLSearchParams({
 
-                        client_id:"react-frontend",
-                        grant_type:"password",
-                        username,
-                        password,
-                        scope:"openid"
+                            client_id: "react-frontend",
+                            grant_type: "password",
+                            username,
+                            password,
+                            scope: "openid"
 
-                    })
-                });
+                        })
+                    });
 
 
-            if(!response.ok){
+            if (!response.ok) {
 
                 return {
-                    success:false,
-                    message:"Błędny login lub hasło"
+                    success: false,
+                    message: "Błędny login lub hasło"
                 };
 
             }
@@ -164,17 +164,17 @@ export default function App({keycloak}) {
 
 
             return {
-                success:true
+                success: true
             };
 
 
-        }catch(err){
+        } catch (err) {
 
             console.error(err);
 
             return {
-                success:false,
-                message:"Błąd logowania"
+                success: false,
+                message: "Błąd logowania"
             };
 
         }
@@ -182,8 +182,7 @@ export default function App({keycloak}) {
     };
 
 
-
-    const handleLogout=()=>{
+    const handleLogout = () => {
 
         localStorage.removeItem("kc_token");
         localStorage.removeItem("kc_refreshToken");
@@ -195,14 +194,13 @@ export default function App({keycloak}) {
     };
 
 
+    if (!isAuthenticated) {
 
-    if(!isAuthenticated){
-
-        if(authPage==="register"){
+        if (authPage === "register") {
 
             return (
                 <RegisterPage
-                    onShowLogin={()=>
+                    onShowLogin={() =>
                         setAuthPage("login")
                     }
                 />
@@ -214,14 +212,13 @@ export default function App({keycloak}) {
         return (
             <LoginPage
                 onLogin={handleLogin}
-                onShowRegister={()=>
+                onShowRegister={() =>
                     setAuthPage("register")
                 }
             />
         );
 
     }
-
 
 
     return (
@@ -238,7 +235,6 @@ export default function App({keycloak}) {
                 />
 
 
-
                 <main className="main-content">
 
 
@@ -249,129 +245,124 @@ export default function App({keycloak}) {
                     />
 
 
-
-                    {currentPage==="dashboard" && (
+                    {currentPage === "dashboard" && (
 
                         <>
 
-                        <div className="dashboard-header">
+                            <div className="dashboard-header">
 
-                            <h1 className="title">
-                                My Projects
-                            </h1>
-
-
-                            <button
-                                className="btn add-task"
-                                onClick={()=>
-                                    setIsAddModalOpen(true)
-                                }
-                            >
-                                + Nowy projekt
-                            </button>
+                                <h1 className="title">
+                                    My Projects
+                                </h1>
 
 
-                            <div className="search-container">
-
-                                <input
-                                    className="search-input"
-                                    placeholder="Search projects..."
-                                    value={search}
-                                    onChange={
-                                        e=>setSearch(e.target.value)
+                                <button
+                                    className="btn add-task"
+                                    onClick={() =>
+                                        setIsAddModalOpen(true)
                                     }
-                                />
+                                >
+                                    + Nowy projekt
+                                </button>
+
+
+                                <div className="search-container">
+
+                                    <input
+                                        className="search-input"
+                                        placeholder="Search projects..."
+                                        value={search}
+                                        onChange={
+                                            e => setSearch(e.target.value)
+                                        }
+                                    />
+
+                                </div>
 
                             </div>
 
-                        </div>
+
+                            <TaskList
+
+                                tasks={projects}
+
+                                onTaskClick={(task) => {
+
+                                    setSelectedTask(task);
+                                    setCurrentPage("details");
+
+                                }}
+
+                            />
 
 
-
-                        <TaskList
-
-                            tasks={projects}
-
-                            onTaskClick={(task)=>{
-
-                                setSelectedTask(task);
-                                setCurrentPage("details");
-
-                            }}
-
-                        />
+                            <div className="pagination">
 
 
-
-                        <div className="pagination">
-
-
-                            <button
-                                disabled={page===0}
-                                onClick={()=>
-                                    setPage(
-                                        p=>Math.max(0,p-1)
-                                    )
-                                }
-                            >
-                                Poprzednia
-                            </button>
+                                <button
+                                    disabled={page === 0}
+                                    onClick={() =>
+                                        setPage(
+                                            p => Math.max(0, p - 1)
+                                        )
+                                    }
+                                >
+                                    Poprzednia
+                                </button>
 
 
-                            <span>
-                                Strona {page+1} z {totalPages}
+                                <span>
+                                Strona {page + 1} z {totalPages}
                             </span>
 
 
-
-                            <button
-                                disabled={
-                                    page>=totalPages-1
-                                }
-                                onClick={()=>
-                                    setPage(
-                                      p=>Math.min(
-                                        totalPages-1,
-                                        p+1
-                                      )
-                                    )
-                                }
-                            >
-                                Następna
-                            </button>
-
+                                <button
+                                    disabled={
+                                        page >= totalPages - 1
+                                    }
+                                    onClick={() =>
+                                        setPage(
+                                            p => Math.min(
+                                                totalPages - 1,
+                                                p + 1
+                                            )
+                                        )
+                                    }
+                                >
+                                    Następna
+                                </button>
 
 
-                            <select
+                                <select
 
-                                value={size}
+                                    value={size}
 
-                                onChange={e=>{
-                                    setSize(
-                                      Number(e.target.value)
-                                    );
-                                    setPage(0);
-                                }}
+                                    onChange={e => {
+                                        setSize(
+                                            Number(e.target.value)
+                                        );
+                                        setPage(0);
+                                    }}
 
-                            >
+                                >
 
-                                <option value={5}>
-                                    5 na stronę
-                                </option>
+                                    <option value={5}>
+                                        5 na stronę
+                                    </option>
 
-                                <option value={10}>
-                                    10 na stronę
-                                </option>
+                                    <option value={10}>
+                                        10 na stronę
+                                    </option>
 
-                                <option value={20}>
-                                    20 na stronę
-                                </option>
-
-
-                            </select>
+                                    <option value={20}>
+                                        20 na stronę
+                                    </option>
 
 
-                        </div>
+                                </select>
+
+
+                            </div>
 
 
                         </>
@@ -379,15 +370,14 @@ export default function App({keycloak}) {
                     )}
 
 
-
-                    {currentPage==="details" &&
-                    selectedTask &&
+                    {currentPage === "details" &&
+                        selectedTask &&
 
                         <ProjectDetails
 
                             project={selectedTask}
 
-                            onBack={()=>
+                            onBack={() =>
                                 setCurrentPage("dashboard")
                             }
 
@@ -404,8 +394,7 @@ export default function App({keycloak}) {
                     }
 
 
-
-                    {currentPage==="settings" &&
+                    {currentPage === "settings" &&
 
                         <Settings
                             setBackground={setBackground}
@@ -414,8 +403,7 @@ export default function App({keycloak}) {
                     }
 
 
-
-                    {currentPage==="admin" &&
+                    {currentPage === "admin" &&
 
                         <AdminPanel
                             setCurrentPage={setCurrentPage}
@@ -425,8 +413,7 @@ export default function App({keycloak}) {
                     }
 
 
-
-                    {currentPage==="editUser" &&
+                    {currentPage === "editUser" &&
 
                         <EditStudent
 
@@ -439,8 +426,7 @@ export default function App({keycloak}) {
                     }
 
 
-
-                    {currentPage==="addTask" &&
+                    {currentPage === "addTask" &&
 
                         <AddTaskPage
 
@@ -453,8 +439,7 @@ export default function App({keycloak}) {
                     }
 
 
-
-                    {currentPage==="addProject" &&
+                    {currentPage === "addProject" &&
 
                         <AddProject
 
@@ -467,19 +452,17 @@ export default function App({keycloak}) {
                     }
 
 
-
                 </main>
 
 
             </div>
 
 
-
             <AddProjectModal
 
                 isOpen={isAddModalOpen}
 
-                onClose={()=>
+                onClose={() =>
                     setIsAddModalOpen(false)
                 }
 

@@ -3,9 +3,12 @@ import keycloak from "../keycloak.js";
 const BASE_URL = "http://localhost:8081/api/zadanie";
 
 
-const authHeaders = () => ({
-    Authorization: `Bearer ${keycloak.token}`
-});
+const authHeaders = async () => {
+    await keycloak.updateToken(30);
+    return {
+        Authorization: `Bearer ${keycloak.token}`
+    };
+};
 
 
 
@@ -14,7 +17,7 @@ export async function fetchTasks() {
     const res = await fetch(
         BASE_URL,
         {
-            headers: authHeaders()
+            headers: await authHeaders()
         }
     );
 
@@ -35,7 +38,7 @@ export async function updateTaskPriorytet(id, status) {
         `${BASE_URL}/${id}/priorytet?priorytet=${status}`,
         {
             method:"PATCH",
-            headers:authHeaders()
+            headers: await authHeaders()
         }
     );
 
@@ -61,7 +64,7 @@ export async function createTask(task) {
 
             headers:{
                 "Content-Type":"application/json",
-                ...authHeaders()
+                ...await authHeaders()
             },
 
             body:
@@ -101,7 +104,7 @@ export async function updateTask(
 
                 headers:{
                     "Content-Type":"application/json",
-                    ...authHeaders()
+                    ...await authHeaders()
                 },
 
                 body:
@@ -133,7 +136,7 @@ export async function deleteTask(
             `${BASE_URL}/${zadanieId}`,
             {
                 method:"DELETE",
-                headers:authHeaders()
+                headers: await authHeaders()
             }
         );
 
@@ -162,7 +165,7 @@ export async function updateTaskStatus(
             `${BASE_URL}/${id}/status?status=${status}`,
             {
                 method:"PATCH",
-                headers:authHeaders()
+                headers: await authHeaders()
             }
         );
 
@@ -191,7 +194,7 @@ export async function assignUserToTask(
             `${BASE_URL}/${taskId}/przypisz/uzytkownik/${userId}`,
             {
                 method:"PATCH",
-                headers:authHeaders()
+                headers: await authHeaders()
             }
         );
 
@@ -219,7 +222,7 @@ export async function removeUserFromTask(
             `${BASE_URL}/${taskId}/usun/uzytkownik`,
             {
                 method:"PATCH",
-                headers:authHeaders()
+                headers: await authHeaders()
             }
         );
 
