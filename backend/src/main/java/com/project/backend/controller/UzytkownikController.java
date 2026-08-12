@@ -11,12 +11,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.logging.Logger;
+
 @RestController
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/api/uzytkownik")
 public class UzytkownikController {
     private final AuthService authService;
     private final UzytkownikService uzytkownikService;
+    Logger logger = Logger.getLogger("UzytkowniController");
 
     @GetMapping
     public ResponseEntity<Page<Uzytkownik>> getUzytkownicy(Pageable pageable) {
@@ -28,8 +32,9 @@ public class UzytkownikController {
         return ResponseEntity.ok(uzytkownikService.getUzytkownik(uzytkownikId));
     }
 
-    @PatchMapping("/update")
+  @PatchMapping("/update")
     public ResponseEntity<Void> updateUzytkownik(@Valid @RequestBody UzytkownikDto dto) {
+        logger.info(dto.toString());
         authService.updateUser(dto);
         return ResponseEntity.ok().build();
     }

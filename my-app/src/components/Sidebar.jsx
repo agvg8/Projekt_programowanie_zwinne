@@ -9,6 +9,9 @@ export default function Sidebar({ setCurrentPage }) {
         <li onClick={() => setCurrentPage("settings")} className="nav-item">
           Settings
         </li>
+          <li onClick={() => setCurrentPage("admin")} className='nav-item'>
+            Admin Panel
+          </li>
       </ul>
     </aside>
   );

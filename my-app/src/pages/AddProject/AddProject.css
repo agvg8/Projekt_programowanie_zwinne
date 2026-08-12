@@ -1,0 +1,134 @@
+.add-project-page {
+    padding: 24px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.add-project-title {
+    font-family: var(--font-heading);
+    font-size: 28px;
+    color: #1f1f1f;
+    margin-bottom: 24px;
+}
+
+.add-project-card {
+    max-width: 650px;
+    background: rgba(255, 255, 255, .85);
+    backdrop-filter: blur(6px);
+    border-radius: 18px;
+    padding: 28px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, .08);
+}
+
+.add-project-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.add-project-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .4px;
+    color: var(--text-soft);
+    text-transform: uppercase;
+}
+
+.add-project-form input,
+.add-project-form textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 13px 15px;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, .08);
+
+    background: rgba(255, 255, 255, .75);
+
+    color: #2f2f2f;
+    -webkit-text-fill-color: #2f2f2f;
+
+    font-family: var(--font-body);
+    font-size: 14px;
+    transition: .2s;
+}
+.add-project-form textarea {
+    min-height: 140px;
+    resize: vertical;
+}
+
+.add-project-form input:focus,
+.add-project-form textarea:focus {
+    outline: none;
+    border-color: #989a35;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(152, 154, 53, .15);
+}
+
+.add-project-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.add-project-buttons button {
+    flex: 1;
+}
+
+.cancel-project-btn {
+    background: #ececec;
+    color: #444;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.cancel-project-btn:hover {
+    background: #dddddd;
+}
+
+.project-error {
+    background: #ffe5e5;
+    color: #8b1e1e;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-weight: 600;
+}
+
+.deadline-group{
+    display:flex;
+    gap:12px;
+}
+
+.deadline-group input{
+    flex:1;
+
+    padding:12px 14px;
+    border-radius:12px;
+    border:1px solid rgba(0,0,0,.08);
+
+    background:rgba(255,255,255,.75);
+    backdrop-filter:blur(6px);
+
+    font-family:var(--font-body);
+    font-size:14px;
+    color:var(--text-main);
+
+    transition:.2s;
+}
+
+.deadline-group input:focus{
+    outline:none;
+    border-color:#989a35;
+    box-shadow:0 0 0 4px rgba(152,154,53,.15);
+}
+
+.deadline-group input:hover{
+    border-color:rgba(152,154,53,.4);
+}
+.deadline-group input::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+}
