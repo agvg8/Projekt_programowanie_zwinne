@@ -45,7 +45,8 @@ public class SecurityConfig {
                         // odczyt projektów i zadań - USER, MANAGER, ADMIN
                         .requestMatchers(HttpMethod.GET,
                                 "/api/projekt/**",
-                                "/api/zadanie/**")
+                                "/api/zadanie/**",
+                                "/api/uzytkownik/**")
                         .hasAnyRole("USER", "MANAGER", "ADMIN")
 
                         // modyfikacja projektów i zadań - MANAGER, ADMIN

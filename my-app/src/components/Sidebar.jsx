@@ -14,6 +14,9 @@ export default function Sidebar({ setCurrentPage, currentPage }) {
         <li onClick={() => setCurrentPage("settings")} className={`nav-item ${currentPage === "settings" ? "active" : ""}`}>
           <FiSettings /> Settings
         </li>
+          <li onClick={() => setCurrentPage("admin")} className='nav-item'>
+            Admin Panel
+          </li>
       </ul>
       <div className="sidebar-spacer" />
       <div className="sidebar-tip"><span>TIP OF THE DAY</span><p>Małe kroki każdego dnia dają duże efekty.</p></div>

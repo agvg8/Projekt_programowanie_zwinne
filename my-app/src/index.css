@@ -143,3 +143,166 @@ body {
   background-position: center;
   background-repeat: no-repeat;
 }
+.task-item.todo {
+  border-left: 5px solid #f59e0b;
+}
+
+.task-item.in_progress {
+  border-left: 5px solid #3b82f6;
+}
+
+.task-item.done {
+  border-left: 5px solid #22c55e;
+  opacity: 0.75;
+}
+
+.task-item.done .task-title {
+  text-decoration: line-through;
+}
+.task-item.done {
+  background: #ececec;
+  opacity: .8;
+}
+
+.task-item.done .task-title {
+  text-decoration: line-through;
+}
+.task-status {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.task-status.todo {
+  background: #f59e0b;
+}
+
+.task-status.in_progress {
+  background: #3b82f6;
+}
+
+.task-status.done {
+  background: #22c55e;
+}
+.task-status-badge {
+  border-radius: 10px;
+  padding: 2px 6px;
+}
+/* EDYCJA DEADLINE */
+
+.deadline-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+
+.deadline-input {
+  padding: 10px 12px;
+
+  border-radius: 10px;
+  border: 1px solid #ccc;
+
+  background: white;
+  color: var(--text-main);
+
+  font-family: var(--font-body);
+  font-size: 14px;
+
+  cursor: text;
+
+  transition: all 0.2s ease;
+
+  position: relative;
+  z-index: 2;
+}
+
+.deadline-input:hover {
+  border-color: #989a35;
+}
+
+.deadline-input:focus {
+  outline: none;
+  border-color: #989a35;
+  box-shadow: 0 0 0 3px rgba(152,154,53,0.15);
+}
+
+/* przywrócenie ikonki kalendarza Chrome */
+.deadline-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 1;
+}
+
+
+.deadline-input:hover {
+  border-color: #989a35;
+}
+
+
+.deadline-input:focus {
+  outline: none;
+  border-color: #989a35;
+
+  box-shadow: 0 0 0 3px rgba(152,154,53,0.15);
+}
+
+
+.deadline-edit-actions {
+  display: flex;
+  gap: 10px;
+}
+
+
+/* Zapisz deadline */
+.deadline-save-btn {
+  padding: 8px 16px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: #989a35;
+  color: white;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+
+.deadline-save-btn:hover {
+  background: #7f812c;
+  transform: translateY(-2px);
+}
+
+
+/* Anuluj deadline */
+.deadline-cancel-btn {
+  padding: 8px 16px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: #e0e0e0;
+  color: #444;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+
+.deadline-cancel-btn:hover {
+  background: #d0d0d0;
+  transform: translateY(-2px);
+}
